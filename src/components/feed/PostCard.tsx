@@ -86,10 +86,10 @@ const PostCard = ({ post }: PostCardProps) => {
           >
             <Heart
               className={`w-7 h-7 transition-all ${
-                liked ? "fill-accent text-accent" : "text-muted-foreground"
+                liked ? "fill-destructive text-destructive" : "text-muted-foreground"
               }`}
             />
-            <span className={`text-xs font-bold ${liked ? "text-accent" : "text-muted-foreground"}`}>
+            <span className={`text-xs font-bold ${liked ? "text-destructive" : "text-muted-foreground"}`}>
               {likeCount}
             </span>
           </button>

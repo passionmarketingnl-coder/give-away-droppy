@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,10 +51,11 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         droppy: {
-          coral: "hsl(var(--droppy-coral))",
-          teal: "hsl(var(--droppy-teal))",
-          "teal-light": "hsl(var(--droppy-teal-light))",
-          warm: "hsl(var(--droppy-warm))",
+          blue: "hsl(var(--droppy-blue))",
+          "blue-dark": "hsl(var(--droppy-blue-dark))",
+          green: "hsl(var(--droppy-green))",
+          light: "hsl(var(--droppy-light))",
+          navy: "hsl(var(--droppy-navy))",
           gold: "hsl(var(--droppy-gold))",
           success: "hsl(var(--droppy-success))",
         },

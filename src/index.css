@@ -2,46 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @layer base {
   :root {
-    --background: 30 33% 97%;
-    --foreground: 220 20% 15%;
+    --background: 0 0% 94%;
+    --foreground: 213 79% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 213 79% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
+    --popover-foreground: 213 79% 13%;
 
-    --primary: 165 55% 38%;
+    --primary: 207 90% 54%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 25% 93%;
-    --secondary-foreground: 220 20% 15%;
+    --secondary: 207 20% 92%;
+    --secondary-foreground: 213 79% 13%;
 
-    --muted: 30 15% 93%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 210 15% 92%;
+    --muted-foreground: 213 20% 46%;
 
-    --accent: 12 80% 58%;
+    --accent: 123 89% 41%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 165 55% 38%;
+    --border: 210 15% 87%;
+    --input: 210 15% 87%;
+    --ring: 207 90% 54%;
 
     --radius: 1rem;
 
-    --droppy-coral: 12 80% 58%;
-    --droppy-teal: 165 55% 38%;
-    --droppy-teal-light: 165 45% 95%;
-    --droppy-warm: 30 33% 97%;
+    --droppy-blue: 207 90% 54%;
+    --droppy-blue-dark: 207 79% 44%;
+    --droppy-green: 123 89% 41%;
+    --droppy-light: 0 0% 94%;
+    --droppy-navy: 213 79% 13%;
     --droppy-gold: 40 85% 55%;
-    --droppy-success: 145 60% 40%;
+    --droppy-success: 123 89% 41%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -50,29 +51,29 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 207 90% 54%;
   }
 
   .dark {
-    --background: 220 20% 10%;
-    --foreground: 30 15% 95%;
-    --card: 220 18% 14%;
-    --card-foreground: 30 15% 95%;
-    --popover: 220 18% 14%;
-    --popover-foreground: 30 15% 95%;
-    --primary: 165 55% 45%;
+    --background: 213 79% 8%;
+    --foreground: 0 0% 94%;
+    --card: 213 60% 12%;
+    --card-foreground: 0 0% 94%;
+    --popover: 213 60% 12%;
+    --popover-foreground: 0 0% 94%;
+    --primary: 207 90% 54%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 20%;
-    --secondary-foreground: 30 15% 95%;
-    --muted: 220 15% 20%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 12 80% 58%;
+    --secondary: 213 40% 18%;
+    --secondary-foreground: 0 0% 94%;
+    --muted: 213 30% 18%;
+    --muted-foreground: 210 15% 55%;
+    --accent: 123 89% 41%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 22%;
-    --input: 220 15% 22%;
-    --ring: 165 55% 45%;
+    --border: 213 30% 20%;
+    --input: 213 30% 20%;
+    --ring: 207 90% 54%;
   }
 }
 
@@ -83,7 +84,7 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Nunito', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -91,10 +92,10 @@
 
 @layer utilities {
   .droppy-shadow {
-    box-shadow: 0 2px 12px -2px hsl(220 20% 15% / 0.08);
+    box-shadow: 0 2px 12px -2px hsl(213 79% 13% / 0.08);
   }
   .droppy-shadow-lg {
-    box-shadow: 0 8px 30px -8px hsl(220 20% 15% / 0.12);
+    box-shadow: 0 8px 30px -8px hsl(213 79% 13% / 0.12);
   }
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);

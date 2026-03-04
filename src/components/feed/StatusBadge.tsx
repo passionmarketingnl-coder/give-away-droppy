@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 type StatusType = "active" | "ending" | "raffled" | "reroll" | "picked_up" | "removed" | "reported";
 
 const statusConfig: Record<StatusType, { label: string; className: string }> = {
-  active: { label: "Actief", className: "bg-droppy-teal-light text-primary" },
+  active: { label: "Actief", className: "bg-primary/10 text-primary" },
   ending: { label: "Bijna afgelopen", className: "bg-droppy-gold/15 text-droppy-gold" },
-  raffled: { label: "Verloot", className: "bg-primary/10 text-primary" },
+  raffled: { label: "Verloot", className: "bg-droppy-green/10 text-droppy-green" },
   reroll: { label: "Herverloting", className: "bg-accent/10 text-accent" },
   picked_up: { label: "Opgehaald", className: "bg-droppy-success/10 text-droppy-success" },
   removed: { label: "Verwijderd", className: "bg-muted text-muted-foreground" },
