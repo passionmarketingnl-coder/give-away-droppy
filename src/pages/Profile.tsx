@@ -83,7 +83,7 @@ const Profile = () => {
           }`}
         >
           <Heart className="w-4 h-4 inline mr-1.5" />
-          Meedoen
+          Geliked
         </button>
       </div>
 
@@ -97,7 +97,7 @@ const Profile = () => {
         {!loading && (!activePosts || activePosts.length === 0) && (
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">
-              {tab === "given" ? "Je hebt nog niets weggegeven." : tab === "won" ? "Je hebt nog niets gewonnen." : "Je doet nog nergens aan mee."}
+              {tab === "given" ? "Je hebt nog niets weggegeven." : tab === "won" ? "Je hebt nog niets gewonnen." : "Je hebt nog niets geliked."}
             </p>
           </div>
         )}
