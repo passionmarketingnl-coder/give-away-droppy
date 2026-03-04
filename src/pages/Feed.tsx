@@ -1,72 +1,34 @@
 import { Search, SlidersHorizontal } from "lucide-react";
-import PostCard, { type PostCardData } from "@/components/feed/PostCard";
+import PostCard from "@/components/feed/PostCard";
 import { motion } from "framer-motion";
+import { usePosts } from "@/hooks/usePosts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 
-const mockPosts: PostCardData[] = [
-  {
-    id: "1",
-    title: "IKEA Kallax kast wit",
-    description: "Goed onderhouden Kallax kast met 4 vakken. Zelf ophalen, begane grond.",
-    category: "Meubels",
-    imageUrl: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=450&fit=crop",
-    images: ["1", "2"],
-    likeCount: 42,
-    status: "active",
-    distance: "1,2 km",
-    timeLeft: "18u over",
-    posterName: "Lisa M.",
-    posterAvatar: "",
-  },
-  {
-    id: "2",
-    title: "Kinderfiets 16 inch",
-    description: "Roze kinderfiets, lichte gebruikssporen maar rijdt prima. Inclusief zijwieltjes.",
-    category: "Kinderen",
-    imageUrl: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=600&h=450&fit=crop",
-    images: ["1"],
-    likeCount: 89,
-    status: "ending",
-    distance: "3,4 km",
-    timeLeft: "2u over",
-    posterName: "Jeroen K.",
-    posterAvatar: "",
-  },
-  {
-    id: "3",
-    title: "Box met babykleding 62-68",
-    description: "Grote doos met rompertjes, pakjes en sokjes. Alles schoon en in goede staat.",
-    category: "Babykleding",
-    imageUrl: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&h=450&fit=crop",
-    images: ["1", "2", "3"],
-    likeCount: 15,
-    status: "active",
-    distance: "0,8 km",
-    timeLeft: "22u over",
-    posterName: "Fatima A.",
-    posterAvatar: "",
-  },
-  {
-    id: "4",
-    title: "Samsung magnetron",
-    description: "Werkt perfect, we hebben een nieuwe gekocht. Zelf ophalen bij voordeur.",
-    category: "Keuken",
-    imageUrl: "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=600&h=450&fit=crop",
-    images: ["1"],
-    likeCount: 67,
-    status: "active",
-    distance: "5,1 km",
-    timeLeft: "12u over",
-    posterName: "Mark V.",
-    posterAvatar: "",
-  },
-];
-
-const categories = ["Alles", "Meubels", "Kinderen", "Keuken", "Elektronica", "Boeken", "Tuin", "Sport"];
+const categories = ["Alles", "Meubels", "Kinderen", "Keuken", "Elektronica", "Boeken", "Tuin", "Sport", "Kleding", "Overig"];
 
 const Feed = () => {
+  const { data: posts, isLoading } = usePosts();
+  const [selectedCategory, setSelectedCategory] = useState("Alles");
+  const [search, setSearch] = useState("");
+
+  const filtered = (posts || []).filter((p) => {
+    if (selectedCategory !== "Alles" && p.category !== selectedCategory) return false;
+    if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const getTimeLeft = (raffleAt: string | null) => {
+    if (!raffleAt) return "";
+    const diff = new Date(raffleAt).getTime() - Date.now();
+    if (diff <= 0) return "Verlopen";
+    const hours = Math.floor(diff / 3600000);
+    if (hours > 0) return `${hours}u over`;
+    return `${Math.floor(diff / 60000)}m over`;
+  };
+
   return (
     <div className="flex flex-col">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 pt-4 pb-2">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-extrabold text-foreground">
@@ -77,23 +39,24 @@ const Feed = () => {
           </button>
         </div>
 
-        {/* Search */}
         <div className="relative mb-3">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
             type="text"
             placeholder="Zoek in je buurt..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full h-12 pl-11 pr-4 rounded-xl bg-card border border-border text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
-        {/* Categories */}
         <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          {categories.map((cat, i) => (
+          {categories.map((cat) => (
             <button
               key={cat}
+              onClick={() => setSelectedCategory(cat)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors tap-highlight-none ${
-                i === 0
+                cat === selectedCategory
                   ? "bg-primary text-primary-foreground"
                   : "bg-card text-foreground border border-border"
               }`}
@@ -104,16 +67,46 @@ const Feed = () => {
         </div>
       </header>
 
-      {/* Feed */}
       <div className="px-4 space-y-4 pb-4">
-        {mockPosts.map((post, index) => (
+        {isLoading && (
+          <>
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-72 rounded-xl" />
+            ))}
+          </>
+        )}
+
+        {!isLoading && filtered.length === 0 && (
+          <div className="text-center py-16">
+            <p className="text-muted-foreground text-lg font-semibold">Nog geen items in je buurt</p>
+            <p className="text-muted-foreground text-sm mt-1">Wees de eerste die iets weggeeft!</p>
+          </div>
+        )}
+
+        {filtered.map((post, index) => (
           <motion.div
             key={post.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08 }}
           >
-            <PostCard post={post} />
+            <PostCard
+              post={{
+                id: post.id,
+                title: post.title,
+                description: post.description,
+                category: post.category,
+                imageUrl: post.images[0]?.image_url || "/placeholder.svg",
+                images: post.images.map((img) => img.id),
+                likeCount: post.like_count,
+                userHasLiked: post.user_has_liked,
+                status: post.status as any,
+                distance: "",
+                timeLeft: getTimeLeft(post.raffle_due_at),
+                posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
+                posterAvatar: post.poster?.avatar_url || "",
+              }}
+            />
           </motion.div>
         ))}
       </div>

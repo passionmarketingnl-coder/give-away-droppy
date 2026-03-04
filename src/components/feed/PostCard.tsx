@@ -1,7 +1,7 @@
 import { Heart, MapPin, Clock, Share2 } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StatusBadge, { type StatusType } from "./StatusBadge";
+import { useToggleLike } from "@/hooks/usePosts";
 
 export interface PostCardData {
   id: string;
@@ -11,6 +11,7 @@ export interface PostCardData {
   imageUrl: string;
   images: string[];
   likeCount: number;
+  userHasLiked: boolean;
   status: StatusType;
   distance: string;
   timeLeft: string;
@@ -23,14 +24,12 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
   const navigate = useNavigate();
+  const toggleLike = useToggleLike();
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setLiked(!liked);
-    setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+    toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -45,7 +44,6 @@ const PostCard = ({ post }: PostCardProps) => {
       className="bg-card rounded-xl overflow-hidden droppy-shadow tap-highlight-none cursor-pointer"
       onClick={() => navigate(`/post/${post.id}`)}
     >
-      {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={post.imageUrl}
@@ -71,7 +69,6 @@ const PostCard = ({ post }: PostCardProps) => {
         )}
       </div>
 
-      {/* Content */}
       <div className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
@@ -81,29 +78,33 @@ const PostCard = ({ post }: PostCardProps) => {
           <button
             onClick={handleLike}
             className={`flex flex-col items-center gap-0.5 min-w-[48px] py-1 tap-highlight-none ${
-              liked ? "animate-heart-pop" : ""
+              post.userHasLiked ? "animate-heart-pop" : ""
             }`}
           >
             <Heart
               className={`w-7 h-7 transition-all ${
-                liked ? "fill-destructive text-destructive" : "text-muted-foreground"
+                post.userHasLiked ? "fill-destructive text-destructive" : "text-muted-foreground"
               }`}
             />
-            <span className={`text-xs font-bold ${liked ? "text-destructive" : "text-muted-foreground"}`}>
-              {likeCount}
+            <span className={`text-xs font-bold ${post.userHasLiked ? "text-destructive" : "text-muted-foreground"}`}>
+              {post.likeCount}
             </span>
           </button>
         </div>
 
         <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5" />
-            {post.distance}
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" />
-            {post.timeLeft}
-          </span>
+          {post.distance && (
+            <span className="inline-flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              {post.distance}
+            </span>
+          )}
+          {post.timeLeft && (
+            <span className="inline-flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {post.timeLeft}
+            </span>
+          )}
           <span className="px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground font-semibold">
             {post.category}
           </span>
