@@ -1,4 +1,5 @@
 import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2, Flame } from "lucide-react";
+import CommentsSection from "@/components/post/CommentsSection";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -139,6 +140,8 @@ const PostDetail = () => {
             <p className="text-sm text-muted-foreground leading-relaxed">{post.pickup_notes}</p>
           </div>
         )}
+
+        <CommentsSection postId={post.id} />
 
         <button className="flex items-center gap-2 text-sm text-muted-foreground py-2">
           <Flag className="w-4 h-4" />

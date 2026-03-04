@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -39,7 +40,7 @@ const Auth = () => {
       email,
       password,
       options: {
-        data: { first_name: firstName, last_name: lastName },
+        data: { first_name: firstName, last_name: lastName, phone_number: phone },
       },
     });
     setLoading(false);
@@ -173,6 +174,16 @@ const Auth = () => {
                 className="h-14 text-base rounded-xl"
               />
               <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Input
+                  type="tel"
+                  placeholder="Telefoonnummer"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="pl-12 h-14 text-base rounded-xl"
+                />
+              </div>
+              <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="email"
@@ -196,7 +207,7 @@ const Auth = () => {
             <Button
               onClick={handleRegister}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={!email || !password || !firstName || !lastName || loading}
+              disabled={!email || !password || !firstName || !lastName || !phone || loading}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registreren"}
             </Button>
