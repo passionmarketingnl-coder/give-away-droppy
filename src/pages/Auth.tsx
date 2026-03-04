@@ -211,7 +211,7 @@ const Auth = () => {
                 className="h-14 text-base rounded-xl"
               />
             </div>
-            <div className="flex items-start gap-3 mt-4 p-4 rounded-xl bg-droppy-teal-light">
+            <div className="flex items-start gap-3 mt-4 p-4 rounded-xl bg-primary/5">
               <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground">
                 Je exacte adres wordt nooit gedeeld. Alleen je buurt is zichtbaar.

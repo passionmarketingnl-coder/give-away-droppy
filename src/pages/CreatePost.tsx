@@ -123,7 +123,7 @@ const CreatePost = () => {
         </div>
 
         {/* Info */}
-        <div className="p-4 rounded-xl bg-droppy-teal-light">
+        <div className="p-4 rounded-xl bg-primary/5">
           <p className="text-sm text-foreground leading-relaxed">
             📍 Je product wordt zichtbaar voor buren binnen <strong>12 km</strong>.
             <br />
