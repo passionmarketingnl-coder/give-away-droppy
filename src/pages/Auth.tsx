@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, ArrowRight, MapPin, CheckCircle } from "lucide-react";
+import { Phone, ArrowRight, MapPin, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import onboardingHero from "@/assets/onboarding-hero.png";
 
 type Step = "welcome" | "phone" | "otp" | "details" | "address";
@@ -11,6 +13,8 @@ const Auth = () => {
   const [step, setStep] = useState<Step>("welcome");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -23,6 +27,72 @@ const Auth = () => {
     enter: { x: 50, opacity: 0 },
     center: { x: 0, opacity: 1 },
     exit: { x: -50, opacity: 0 },
+  };
+
+  const formatPhone = (raw: string) => {
+    let cleaned = raw.replace(/[^\d+]/g, "");
+    if (cleaned.startsWith("06")) {
+      cleaned = "+316" + cleaned.slice(2);
+    } else if (cleaned.startsWith("6") && !cleaned.startsWith("+")) {
+      cleaned = "+316" + cleaned.slice(1);
+    } else if (!cleaned.startsWith("+")) {
+      cleaned = "+31" + cleaned;
+    }
+    return cleaned;
+  };
+
+  const handleSendOtp = async () => {
+    setLoading(true);
+    const formattedPhone = formatPhone(phone);
+    const { error } = await supabase.auth.signInWithOtp({ phone: formattedPhone });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Fout", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Code verstuurd!", description: `SMS naar ${formattedPhone}` });
+      setStep("otp");
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    setLoading(true);
+    const formattedPhone = formatPhone(phone);
+    const { error } = await supabase.auth.verifyOtp({
+      phone: formattedPhone,
+      token: otp,
+      type: "sms",
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Verificatie mislukt", description: error.message, variant: "destructive" });
+    } else {
+      setStep("details");
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.from("profiles").update({
+      first_name: form.first_name,
+      last_name: form.last_name,
+      email: form.email,
+      postcode: form.postcode,
+      house_number: form.house_number,
+      display_location: form.postcode.replace(/\s/g, "").slice(0, 4),
+    }).eq("id", user.id);
+
+    setLoading(false);
+    if (error) {
+      toast({ title: "Fout bij opslaan", description: error.message, variant: "destructive" });
+    } else {
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -95,12 +165,11 @@ const Auth = () => {
               />
             </div>
             <Button
-              onClick={() => setStep("otp")}
+              onClick={handleSendOtp}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={phone.length < 8}
+              disabled={phone.length < 8 || loading}
             >
-              Stuur code
-              <ArrowRight className="w-5 h-5 ml-2" />
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Stuur code <ArrowRight className="w-5 h-5 ml-2" /></>}
             </Button>
           </motion.div>
         )}
@@ -116,7 +185,7 @@ const Auth = () => {
           >
             <h2 className="text-2xl font-extrabold text-foreground mb-2">Voer de code in</h2>
             <p className="text-muted-foreground mb-8">
-              We hebben een SMS gestuurd naar {phone}
+              We hebben een SMS gestuurd naar {formatPhone(phone)}
             </p>
             <Input
               type="text"
@@ -128,14 +197,16 @@ const Auth = () => {
               maxLength={6}
             />
             <Button
-              onClick={() => setStep("details")}
+              onClick={handleVerifyOtp}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={otp.length < 6}
+              disabled={otp.length < 6 || loading}
             >
-              Verifiëren
-              <ArrowRight className="w-5 h-5 ml-2" />
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Verifiëren <ArrowRight className="w-5 h-5 ml-2" /></>}
             </Button>
-            <button className="text-sm text-primary font-semibold mt-4 text-center">
+            <button
+              onClick={handleSendOtp}
+              className="text-sm text-primary font-semibold mt-4 text-center"
+            >
               Geen code ontvangen? Opnieuw sturen
             </button>
           </motion.div>
@@ -218,15 +289,11 @@ const Auth = () => {
               </p>
             </div>
             <Button
-              onClick={() => {
-                // TODO: integrate with Supabase Auth
-                window.location.href = "/";
-              }}
+              onClick={handleSaveProfile}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={!form.postcode || !form.house_number}
+              disabled={!form.postcode || !form.house_number || loading}
             >
-              Start met Droppy
-              <CheckCircle className="w-5 h-5 ml-2" />
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Start met Droppy <CheckCircle className="w-5 h-5 ml-2" /></>}
             </Button>
           </motion.div>
         )}
