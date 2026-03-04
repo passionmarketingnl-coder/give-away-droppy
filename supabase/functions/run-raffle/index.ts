@@ -16,12 +16,17 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    const now = new Date();
+    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
+
     // Find posts that are due for raffle (raffle_due_at <= now AND status is active/ending)
+    // Posts must have been live for at least 4 hours before they can be raffled
     const { data: duePosts, error: fetchError } = await supabase
       .from("posts")
-      .select("id, user_id, title")
+      .select("id, user_id, title, created_at")
       .in("status", ["active", "ending"])
-      .lte("raffle_due_at", new Date().toISOString());
+      .lte("raffle_due_at", now.toISOString())
+      .lte("created_at", fourHoursAgo);
 
     if (fetchError) throw fetchError;
 
