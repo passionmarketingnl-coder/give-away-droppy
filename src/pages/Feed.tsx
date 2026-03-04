@@ -1,10 +1,18 @@
-import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2, ArrowUpDown, Clock, Heart } from "lucide-react";
 import PostCard from "@/components/feed/PostCard";
 import { motion } from "framer-motion";
 import { usePosts } from "@/hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const categories = ["Alles", "Meubels", "Kinderen", "Keuken", "Elektronica", "Boeken", "Tuin", "Sport", "Kleding", "Overig"];
 
@@ -15,6 +23,7 @@ const Feed = () => {
   const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState("Alles");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "ending" | "popular">("newest");
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
 
@@ -87,6 +96,14 @@ const Feed = () => {
     if (selectedCategory !== "Alles" && p.category !== selectedCategory) return false;
     if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
+  }).sort((a, b) => {
+    if (sortBy === "popular") return b.like_count - a.like_count;
+    if (sortBy === "ending") {
+      const aTime = a.raffle_due_at ? new Date(a.raffle_due_at).getTime() : Infinity;
+      const bTime = b.raffle_due_at ? new Date(b.raffle_due_at).getTime() : Infinity;
+      return aTime - bTime;
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   const getTimeLeft = (raffleAt: string | null) => {
@@ -115,9 +132,26 @@ const Feed = () => {
           <h1 className="text-2xl font-extrabold text-foreground">
             <span className="text-primary">Droppy</span>
           </h1>
-          <button className="w-10 h-10 rounded-full bg-card flex items-center justify-center droppy-shadow">
-            <SlidersHorizontal className="w-5 h-5 text-foreground" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="w-10 h-10 rounded-full bg-card flex items-center justify-center droppy-shadow">
+                <SlidersHorizontal className="w-5 h-5 text-foreground" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Sorteren op</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSortBy("newest")} className={sortBy === "newest" ? "bg-accent" : ""}>
+                <Clock className="w-4 h-4 mr-2" /> Nieuwste eerst
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("ending")} className={sortBy === "ending" ? "bg-accent" : ""}>
+                <ArrowUpDown className="w-4 h-4 mr-2" /> Bijna afgelopen
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortBy("popular")} className={sortBy === "popular" ? "bg-accent" : ""}>
+                <Heart className="w-4 h-4 mr-2" /> Meeste likes
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div
