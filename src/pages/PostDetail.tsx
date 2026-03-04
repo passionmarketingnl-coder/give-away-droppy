@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2, Flame } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -90,6 +90,30 @@ const PostDetail = () => {
             {post.like_count} deelnemers
           </span>
         </div>
+
+        {(() => {
+          const isOldEnough = (Date.now() - new Date(post.created_at).getTime()) >= 4 * 60 * 60 * 1000;
+          const likesNeeded = 100 - post.like_count;
+          if (!isOldEnough || likesNeeded <= 0 || post.status !== "active") return null;
+          const progress = Math.min((post.like_count / 100) * 100, 100);
+          return (
+            <div className="space-y-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+              <div className="flex items-center justify-between text-sm">
+                <span className="inline-flex items-center gap-1.5 font-bold text-primary">
+                  <Flame className="w-4 h-4" />
+                  Nog {likesNeeded} likes tot de loting!
+                </span>
+                <span className="font-bold text-foreground">{post.like_count}/100</span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="flex items-center gap-3 py-3 border-y border-border">
           <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">

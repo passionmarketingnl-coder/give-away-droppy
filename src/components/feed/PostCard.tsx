@@ -1,4 +1,4 @@
-import { Heart, MapPin, Clock, Share2 } from "lucide-react";
+import { Heart, MapPin, Clock, Share2, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import StatusBadge, { type StatusType } from "./StatusBadge";
 import { useToggleLike } from "@/hooks/usePosts";
@@ -17,6 +17,7 @@ export interface PostCardData {
   timeLeft: string;
   posterName: string;
   posterAvatar: string;
+  createdAt: string;
 }
 
 interface PostCardProps {
@@ -109,6 +110,30 @@ const PostCard = ({ post }: PostCardProps) => {
             {post.category}
           </span>
         </div>
+
+        {(() => {
+          const isOldEnough = (Date.now() - new Date(post.createdAt).getTime()) >= 4 * 60 * 60 * 1000;
+          const likesNeeded = 100 - post.likeCount;
+          if (!isOldEnough || likesNeeded <= 0 || post.status !== "active") return null;
+          const progress = Math.min((post.likeCount / 100) * 100, 100);
+          return (
+            <div className="mt-3 space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="inline-flex items-center gap-1 font-semibold text-primary">
+                  <Flame className="w-3.5 h-3.5" />
+                  Nog {likesNeeded} likes tot de loting!
+                </span>
+                <span className="font-bold text-foreground">{post.likeCount}/100</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </article>
   );

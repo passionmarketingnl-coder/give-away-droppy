@@ -105,6 +105,7 @@ const Feed = () => {
                 timeLeft: getTimeLeft(post.raffle_due_at),
                 posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
                 posterAvatar: post.poster?.avatar_url || "",
+                createdAt: post.created_at,
               }}
             />
           </motion.div>
