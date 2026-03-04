@@ -14,7 +14,408 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          parent_id: string | null
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          parent_id?: string | null
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          poster_user_id: string
+          status: Database["public"]["Enums"]["conversation_status"]
+          updated_at: string
+          winner_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          poster_user_id: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          updated_at?: string
+          winner_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          poster_user_id?: string
+          status?: Database["public"]["Enums"]["conversation_status"]
+          updated_at?: string
+          winner_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          conversation_id: string
+          created_at: string
+          id: string
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          is_read: boolean
+          post_id: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          post_id?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          post_id: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          post_id: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          post_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_images_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          is_valid: boolean
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_valid?: boolean
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          pickup_notes: string | null
+          raffle_due_at: string | null
+          raffle_trigger_type: string | null
+          status: Database["public"]["Enums"]["post_status"]
+          title: string
+          updated_at: string
+          user_id: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          pickup_notes?: string | null
+          raffle_due_at?: string | null
+          raffle_trigger_type?: string | null
+          status?: Database["public"]["Enums"]["post_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          pickup_notes?: string | null
+          raffle_due_at?: string | null
+          raffle_trigger_type?: string | null
+          status?: Database["public"]["Enums"]["post_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+          winner_user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_location: string | null
+          email: string | null
+          first_name: string
+          house_number: string | null
+          id: string
+          is_banned: boolean
+          last_name: string
+          latitude: number | null
+          longitude: number | null
+          phone: string | null
+          postcode: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_location?: string | null
+          email?: string | null
+          first_name?: string
+          house_number?: string | null
+          id: string
+          is_banned?: boolean
+          last_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          postcode?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_location?: string | null
+          email?: string | null
+          first_name?: string
+          house_number?: string | null
+          id?: string
+          is_banned?: boolean
+          last_name?: string
+          latitude?: number | null
+          longitude?: number | null
+          phone?: string | null
+          postcode?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      raffles: {
+        Row: {
+          created_at: string
+          id: string
+          participant_count: number
+          post_id: string
+          reroll_of_raffle_id: string | null
+          trigger_reason: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          participant_count?: number
+          post_id: string
+          reroll_of_raffle_id?: string | null
+          trigger_reason?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          participant_count?: number
+          post_id?: string
+          reroll_of_raffle_id?: string | null
+          trigger_reason?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raffles_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raffles_reroll_of_raffle_id_fkey"
+            columns: ["reroll_of_raffle_id"]
+            isOneToOne: false
+            referencedRelation: "raffles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string | null
+          reason: string
+          reported_user_id: string | null
+          reporter_user_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason: string
+          reported_user_id?: string | null
+          reporter_user_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string | null
+          reason?: string
+          reported_user_id?: string | null
+          reporter_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +424,23 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      conversation_status: "open" | "pickup_planned" | "completed"
+      notification_type:
+        | "comment"
+        | "reply"
+        | "raffle_won"
+        | "raffle_completed"
+        | "chat_message"
+        | "reroll"
+        | "moderation"
+      post_status:
+        | "active"
+        | "ending"
+        | "raffled"
+        | "reroll"
+        | "picked_up"
+        | "removed"
+        | "reported"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +567,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      conversation_status: ["open", "pickup_planned", "completed"],
+      notification_type: [
+        "comment",
+        "reply",
+        "raffle_won",
+        "raffle_completed",
+        "chat_message",
+        "reroll",
+        "moderation",
+      ],
+      post_status: [
+        "active",
+        "ending",
+        "raffled",
+        "reroll",
+        "picked_up",
+        "removed",
+        "reported",
+      ],
+    },
   },
 } as const
