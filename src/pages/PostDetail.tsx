@@ -40,8 +40,8 @@ const PostDetail = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <div className="relative aspect-square bg-muted">
+    <div className="flex flex-col min-h-screen bg-background max-w-lg mx-auto">
+      <div className="relative aspect-[4/3] sm:aspect-[16/10] bg-muted">
         {images.length > 0 ? (
           <img src={images[currentImage]} alt={post.title} className="w-full h-full object-cover" />
         ) : (
