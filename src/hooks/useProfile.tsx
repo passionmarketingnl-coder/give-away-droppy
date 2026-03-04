@@ -44,6 +44,39 @@ export const useWonPosts = () => {
   });
 };
 
+export const useLikedPosts = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ["liked-posts"],
+    queryFn: async () => {
+      // Get all post IDs the user has liked
+      const { data: likes, error: likesError } = await supabase
+        .from("post_likes")
+        .select("post_id")
+        .eq("user_id", user!.id)
+        .eq("is_valid", true);
+      if (likesError) throw likesError;
+
+      const postIds = (likes || []).map((l) => l.post_id);
+      if (postIds.length === 0) return [];
+
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*, post_images(*)")
+        .in("id", postIds)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      return (data || []).map((p) => ({
+        ...p,
+        images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+      }));
+    },
+    enabled: !!user,
+  });
+};
+
 export const useUnreadNotificationCount = () => {
   const { user } = useAuth();
 
