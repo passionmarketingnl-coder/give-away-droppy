@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone, MapPin, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,8 @@ const Auth = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [houseNumber, setHouseNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -36,19 +38,31 @@ const Auth = () => {
 
   const handleRegister = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const cleanPostcode = postcode.toUpperCase().replace(/\s/g, '');
+    const { error, data } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { first_name: firstName, last_name: lastName, phone_number: phone },
+        data: { first_name: firstName, last_name: lastName, phone_number: phone, postcode: cleanPostcode, house_number: houseNumber },
       },
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast({ title: "Registratie mislukt", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Account aangemaakt!", description: "Je bent nu ingelogd." });
+      return;
     }
+    // Geocode address in background
+    if (data.session) {
+      try {
+        await supabase.functions.invoke("geocode-address", {
+          body: { postcode: cleanPostcode, house_number: houseNumber },
+        });
+      } catch (e) {
+        console.warn("Geocoding failed, can be retried later", e);
+      }
+    }
+    setLoading(false);
+    toast({ title: "Account aangemaakt!", description: "Je bent nu ingelogd." });
   };
 
   return (
@@ -183,6 +197,27 @@ const Auth = () => {
                   className="pl-12 h-14 text-base rounded-xl"
                 />
               </div>
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Postcode"
+                    value={postcode}
+                    onChange={(e) => setPostcode(e.target.value)}
+                    className="pl-12 h-14 text-base rounded-xl"
+                    maxLength={7}
+                  />
+                </div>
+                <div className="relative w-28">
+                  <Home className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Nr."
+                    value={houseNumber}
+                    onChange={(e) => setHouseNumber(e.target.value)}
+                    className="pl-12 h-14 text-base rounded-xl"
+                  />
+                </div>
+              </div>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
@@ -207,7 +242,7 @@ const Auth = () => {
             <Button
               onClick={handleRegister}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={!email || !password || !firstName || !lastName || !phone || loading}
+              disabled={!email || !password || !firstName || !lastName || !phone || !postcode || !houseNumber || loading}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registreren"}
             </Button>
