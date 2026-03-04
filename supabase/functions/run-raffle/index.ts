@@ -19,8 +19,32 @@ Deno.serve(async (req) => {
     const now = new Date();
     const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
 
-    // Find posts that are due for raffle (raffle_due_at <= now AND status is active/ending)
-    // Posts must have been live for at least 4 hours before they can be raffled
+    // === STEP 1: Check posts with 100+ likes that are at least 4 hours old ===
+    // These get raffled early (before the 24h timer)
+    const { data: allActivePosts } = await supabase
+      .from("posts")
+      .select("id, user_id, title, created_at")
+      .in("status", ["active", "ending"])
+      .lte("created_at", fourHoursAgo);
+
+    for (const post of allActivePosts || []) {
+      const { count } = await supabase
+        .from("post_likes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", post.id)
+        .eq("is_valid", true);
+
+      if ((count || 0) >= 100) {
+        // Mark as ending so it gets picked up for raffle below
+        await supabase
+          .from("posts")
+          .update({ status: "ending", raffle_due_at: now.toISOString() })
+          .eq("id", post.id)
+          .eq("status", "active");
+      }
+    }
+
+    // === STEP 2: Raffle all posts where raffle_due_at <= now AND created >= 4h ago ===
     const { data: duePosts, error: fetchError } = await supabase
       .from("posts")
       .select("id, user_id, title, created_at")
@@ -33,7 +57,6 @@ Deno.serve(async (req) => {
     const results = [];
 
     for (const post of duePosts || []) {
-      // Get valid likes for this post
       const { data: likes, error: likesError } = await supabase
         .from("post_likes")
         .select("user_id")
@@ -42,13 +65,11 @@ Deno.serve(async (req) => {
 
       if (likesError) throw likesError;
 
-      // Filter out the post owner
       const participants = (likes || []).filter(
         (l) => l.user_id !== post.user_id
       );
 
       if (participants.length === 0) {
-        // No participants — mark as removed
         await supabase
           .from("posts")
           .update({ status: "removed" })
@@ -57,32 +78,30 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      // Pick random winner
       const winner =
         participants[Math.floor(Math.random() * participants.length)];
 
-      // Update post
+      const triggerReason =
+        participants.length >= 100 ? "likes_threshold" : "timer";
+
       await supabase
         .from("posts")
         .update({ status: "raffled", winner_user_id: winner.user_id })
         .eq("id", post.id);
 
-      // Create raffle record
       await supabase.from("raffles").insert({
         post_id: post.id,
         winner_user_id: winner.user_id,
         participant_count: participants.length,
-        trigger_reason: "timer",
+        trigger_reason: triggerReason,
       });
 
-      // Create conversation between poster and winner
       await supabase.from("conversations").insert({
         post_id: post.id,
         poster_user_id: post.user_id,
         winner_user_id: winner.user_id,
       });
 
-      // Notify winner
       await supabase.from("notifications").insert({
         user_id: winner.user_id,
         type: "raffle_won",
@@ -91,7 +110,6 @@ Deno.serve(async (req) => {
         post_id: post.id,
       });
 
-      // Notify poster
       await supabase.from("notifications").insert({
         user_id: post.user_id,
         type: "raffle_completed",
@@ -104,6 +122,7 @@ Deno.serve(async (req) => {
         post_id: post.id,
         winner: winner.user_id,
         participants: participants.length,
+        trigger: triggerReason,
       });
     }
 
