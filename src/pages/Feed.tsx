@@ -1,18 +1,69 @@
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
 import PostCard from "@/components/feed/PostCard";
 import { motion } from "framer-motion";
 import { usePosts } from "@/hooks/usePosts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const categories = ["Alles", "Meubels", "Kinderen", "Keuken", "Elektronica", "Boeken", "Tuin", "Sport", "Kleding", "Overig"];
 
+const PULL_THRESHOLD = 80;
+
 const Feed = () => {
   const { data: posts, isLoading } = usePosts();
+  const queryClient = useQueryClient();
   const [selectedCategory, setSelectedCategory] = useState("Alles");
   const [search, setSearch] = useState("");
   const [headerVisible, setHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
+
+  // Pull-to-refresh state
+  const [pullDistance, setPullDistance] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const touchStartY = useRef(0);
+  const isPulling = useRef(false);
+
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    const container = document.querySelector("main");
+    if (!container || container.scrollTop > 0) return;
+    touchStartY.current = e.touches[0].clientY;
+    isPulling.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isPulling.current || refreshing) return;
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) {
+      setPullDistance(Math.min(diff * 0.5, PULL_THRESHOLD * 1.5));
+    }
+  }, [refreshing]);
+
+  const handleTouchEnd = useCallback(async () => {
+    if (!isPulling.current) return;
+    isPulling.current = false;
+    if (pullDistance >= PULL_THRESHOLD && !refreshing) {
+      setRefreshing(true);
+      setPullDistance(PULL_THRESHOLD * 0.6);
+      await queryClient.invalidateQueries({ queryKey: ["posts"] });
+      await new Promise((r) => setTimeout(r, 500));
+      setRefreshing(false);
+    }
+    setPullDistance(0);
+  }, [pullDistance, refreshing, queryClient]);
+
+  useEffect(() => {
+    const el = document.querySelector("main");
+    if (!el) return;
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    el.addEventListener("touchmove", handleTouchMove, { passive: true });
+    el.addEventListener("touchend", handleTouchEnd);
+    return () => {
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [handleTouchStart, handleTouchMove, handleTouchEnd]);
 
   useEffect(() => {
     const container = document.querySelector("main");
@@ -49,6 +100,16 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="flex items-center justify-center overflow-hidden transition-all duration-200"
+        style={{ height: pullDistance > 0 || refreshing ? `${Math.max(pullDistance, refreshing ? 48 : 0)}px` : "0px" }}
+      >
+        <Loader2
+          className={`w-5 h-5 text-primary transition-opacity ${refreshing ? "animate-spin opacity-100" : pullDistance >= PULL_THRESHOLD ? "opacity-100" : "opacity-40"}`}
+        />
+      </div>
+
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 pt-4 pb-2">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-2xl font-extrabold text-foreground">
