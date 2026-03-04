@@ -1,7 +1,7 @@
-import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2 } from "lucide-react";
+import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useMyPosts, useWonPosts } from "@/hooks/useProfile";
+import { useMyPosts, useWonPosts, useLikedPosts } from "@/hooks/useProfile";
 import { useState } from "react";
 
 const statusLabels: Record<string, string> = {
@@ -18,7 +18,8 @@ const Profile = () => {
   const { user, signOut } = useAuth();
   const { data: myPosts, isLoading: postsLoading } = useMyPosts();
   const { data: wonPosts, isLoading: wonLoading } = useWonPosts();
-  const [tab, setTab] = useState<"given" | "won">("given");
+  const { data: likedPosts, isLoading: likedLoading } = useLikedPosts();
+  const [tab, setTab] = useState<"given" | "won" | "liked">("given");
 
   const displayName = user?.user_metadata?.first_name
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
@@ -28,8 +29,8 @@ const Profile = () => {
     ? `${user.user_metadata.first_name.charAt(0)}${(user.user_metadata.last_name || "").charAt(0)}`
     : "?";
 
-  const activePosts = tab === "given" ? myPosts : wonPosts;
-  const loading = tab === "given" ? postsLoading : wonLoading;
+  const activePosts = tab === "given" ? myPosts : tab === "won" ? wonPosts : likedPosts;
+  const loading = tab === "given" ? postsLoading : tab === "won" ? wonLoading : likedLoading;
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -75,6 +76,15 @@ const Profile = () => {
           <Trophy className="w-4 h-4 inline mr-1.5" />
           Gewonnen
         </button>
+        <button
+          onClick={() => setTab("liked")}
+          className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+            tab === "liked" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-foreground"
+          }`}
+        >
+          <Heart className="w-4 h-4 inline mr-1.5" />
+          Meedoen
+        </button>
       </div>
 
       {/* Items list */}
@@ -87,7 +97,7 @@ const Profile = () => {
         {!loading && (!activePosts || activePosts.length === 0) && (
           <div className="text-center py-8">
             <p className="text-muted-foreground text-sm">
-              {tab === "given" ? "Je hebt nog niets weggegeven." : "Je hebt nog niets gewonnen."}
+              {tab === "given" ? "Je hebt nog niets weggegeven." : tab === "won" ? "Je hebt nog niets gewonnen." : "Je doet nog nergens aan mee."}
             </p>
           </div>
         )}
