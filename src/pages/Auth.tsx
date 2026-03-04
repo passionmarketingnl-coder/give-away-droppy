@@ -86,7 +86,7 @@ const Auth = () => {
             <p className="text-base text-muted-foreground text-center mb-2 max-w-xs">
               Geef gratis weg aan je buren. Eerlijk verloot, makkelijk opgehaald.
             </p>
-            <div className="flex flex-col gap-3 mt-6 w-full max-w-xs">
+            <div className="flex flex-col gap-3 mt-6 w-full max-w-xs items-center">
               <div className="flex items-center gap-3 text-sm text-foreground">
                 <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
                 <span>Plaats iets gratis in je buurt</span>
