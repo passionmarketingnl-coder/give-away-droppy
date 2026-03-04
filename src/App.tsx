@@ -9,6 +9,7 @@ import Feed from "./pages/Feed";
 import PostDetail from "./pages/PostDetail";
 import CreatePost from "./pages/CreatePost";
 import Chats from "./pages/Chats";
+import ChatDetail from "./pages/ChatDetail";
 import Notifications from "./pages/Notifications";
 import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
@@ -39,6 +40,7 @@ const AppRoutes = () => {
         <Route path="/profile" element={<Profile />} />
       </Route>
       <Route path="/post/:id" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
+      <Route path="/chat/:id" element={<ProtectedRoute><ChatDetail /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
