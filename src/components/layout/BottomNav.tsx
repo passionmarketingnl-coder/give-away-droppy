@@ -1,16 +1,18 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, PlusCircle, MessageCircle, Bell, User } from "lucide-react";
+import { useUnreadNotificationCount } from "@/hooks/useProfile";
 
 const navItems = [
   { to: "/", icon: Home, label: "Feed" },
   { to: "/chats", icon: MessageCircle, label: "Chats" },
   { to: "/create", icon: PlusCircle, label: "Geef weg", isCreate: true },
-  { to: "/notifications", icon: Bell, label: "Meldingen" },
+  { to: "/notifications", icon: Bell, label: "Meldingen", badge: true },
   { to: "/profile", icon: User, label: "Profiel" },
 ];
 
 const BottomNav = () => {
   const location = useLocation();
+  const { data: unreadCount } = useUnreadNotificationCount();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-bottom">
@@ -37,13 +39,20 @@ const BottomNav = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              className="flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-2 tap-highlight-none"
+              className="relative flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-2 tap-highlight-none"
             >
-              <Icon
-                className={`w-6 h-6 transition-colors ${
-                  isActive ? "text-primary" : "text-muted-foreground"
-                }`}
-              />
+              <div className="relative">
+                <Icon
+                  className={`w-6 h-6 transition-colors ${
+                    isActive ? "text-primary" : "text-muted-foreground"
+                  }`}
+                />
+                {item.badge && unreadCount && unreadCount > 0 ? (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-accent text-accent-foreground text-[10px] font-bold flex items-center justify-center">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                ) : null}
+              </div>
               <span
                 className={`text-[10px] font-semibold transition-colors ${
                   isActive ? "text-primary" : "text-muted-foreground"
