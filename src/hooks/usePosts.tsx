@@ -146,7 +146,14 @@ export const useCreatePost = () => {
     }) => {
       if (!user) throw new Error("Not authenticated");
 
-      // Create post
+      // Get user profile for coordinates
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("latitude, longitude")
+        .eq("id", user.id)
+        .single();
+
+      // Create post with user's coordinates
       const { data: post, error: postError } = await supabase
         .from("posts")
         .insert({
@@ -156,6 +163,8 @@ export const useCreatePost = () => {
           pickup_notes: input.pickup_notes || null,
           user_id: user.id,
           raffle_due_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          latitude: profile?.latitude || null,
+          longitude: profile?.longitude || null,
         })
         .select()
         .single();
