@@ -18,12 +18,39 @@ export interface Post {
   poster: { first_name: string; last_name: string; avatar_url: string | null } | null;
 }
 
+// Haversine distance in km
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const RADIUS_KM = 7;
+
 export const usePosts = () => {
   const { user } = useAuth();
 
   return useQuery({
     queryKey: ["posts"],
     queryFn: async (): Promise<Post[]> => {
+      // Get current user's coordinates
+      let userLat: number | null = null;
+      let userLng: number | null = null;
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("latitude, longitude")
+          .eq("id", user.id)
+          .single();
+        userLat = profile?.latitude ?? null;
+        userLng = profile?.longitude ?? null;
+      }
+
       const { data: posts, error } = await supabase
         .from("posts")
         .select("*, post_images(*), profiles(first_name, last_name, avatar_url)")
@@ -48,7 +75,7 @@ export const usePosts = () => {
         if (l.user_id === user?.id) userLikes[l.post_id] = true;
       });
 
-      return (posts || []).map((p) => ({
+      const allPosts = (posts || []).map((p) => ({
         id: p.id,
         title: p.title,
         description: p.description,
@@ -63,6 +90,21 @@ export const usePosts = () => {
         user_has_liked: !!userLikes[p.id],
         poster: p.profiles as any,
       }));
+
+      // Filter by 7km radius if user has coordinates
+      if (userLat != null && userLng != null) {
+        return allPosts.filter((post) => {
+          // Show user's own posts regardless of distance
+          if (post.user_id === user?.id) return true;
+          // Posts without coordinates are hidden (legacy data)
+          const postLat = (posts || []).find((pp) => pp.id === post.id)?.latitude;
+          const postLng = (posts || []).find((pp) => pp.id === post.id)?.longitude;
+          if (postLat == null || postLng == null) return true; // Show posts without coords for now
+          return haversineKm(userLat, userLng, postLat, postLng) <= RADIUS_KM;
+        });
+      }
+
+      return allPosts;
     },
   });
 };
@@ -146,7 +188,14 @@ export const useCreatePost = () => {
     }) => {
       if (!user) throw new Error("Not authenticated");
 
-      // Create post
+      // Get user profile for coordinates
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("latitude, longitude")
+        .eq("id", user.id)
+        .single();
+
+      // Create post with user's coordinates
       const { data: post, error: postError } = await supabase
         .from("posts")
         .insert({
@@ -156,6 +205,8 @@ export const useCreatePost = () => {
           pickup_notes: input.pickup_notes || null,
           user_id: user.id,
           raffle_due_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          latitude: profile?.latitude || null,
+          longitude: profile?.longitude || null,
         })
         .select()
         .single();
