@@ -158,6 +158,8 @@ export const usePost = (id: string) => {
         like_count: likeCount,
         user_has_liked: userLiked,
         poster: p.profiles as any,
+        display_location: (p as any).display_location || null,
+        distance_km: null,
       };
     },
     enabled: !!id,
