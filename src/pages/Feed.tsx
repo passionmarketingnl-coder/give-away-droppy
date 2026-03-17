@@ -2,6 +2,7 @@ import { Search, SlidersHorizontal, Loader2, ArrowUpDown, Clock, Heart } from "l
 import PostCard from "@/components/feed/PostCard";
 import { motion } from "framer-motion";
 import { usePosts } from "@/hooks/usePosts";
+import { dummyPosts } from "@/data/dummyPosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -92,18 +93,35 @@ const Feed = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const filtered = (posts || []).filter((p) => {
+  const hasPosts = (posts || []).length > 0;
+  const feedItems = hasPosts
+    ? (posts || []).map((post) => ({
+        id: post.id,
+        title: post.title,
+        description: post.description,
+        category: post.category,
+        imageUrl: post.images[0]?.image_url || "/placeholder.svg",
+        images: post.images.map((img) => img.id),
+        likeCount: post.like_count,
+        userHasLiked: post.user_has_liked,
+        status: post.status as any,
+        distance: post.distance_km != null ? `${post.distance_km} km` : "",
+        timeLeft: getTimeLeft(post.raffle_due_at),
+        posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
+        posterAvatar: post.poster?.avatar_url || "",
+        createdAt: post.created_at,
+        displayLocation: post.display_location || "",
+      }))
+    : dummyPosts;
+
+  const filtered = feedItems.filter((p) => {
     if (selectedCategory !== "Alles" && p.category !== selectedCategory) return false;
     if (search && !p.title.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   }).sort((a, b) => {
-    if (sortBy === "popular") return b.like_count - a.like_count;
-    if (sortBy === "ending") {
-      const aTime = a.raffle_due_at ? new Date(a.raffle_due_at).getTime() : Infinity;
-      const bTime = b.raffle_due_at ? new Date(b.raffle_due_at).getTime() : Infinity;
-      return aTime - bTime;
-    }
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    if (sortBy === "popular") return b.likeCount - a.likeCount;
+    if (sortBy === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    return 0;
   });
 
   const getTimeLeft = (raffleAt: string | null) => {
@@ -234,25 +252,7 @@ const Feed = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08 }}
           >
-            <PostCard
-              post={{
-                id: post.id,
-                title: post.title,
-                description: post.description,
-                category: post.category,
-                imageUrl: post.images[0]?.image_url || "/placeholder.svg",
-                images: post.images.map((img) => img.id),
-                likeCount: post.like_count,
-                userHasLiked: post.user_has_liked,
-                status: post.status as any,
-                distance: post.distance_km != null ? `${post.distance_km} km` : "",
-                timeLeft: getTimeLeft(post.raffle_due_at),
-                posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
-                posterAvatar: post.poster?.avatar_url || "",
-                createdAt: post.created_at,
-                displayLocation: post.display_location || "",
-              }}
-            />
+            <PostCard post={post} />
           </motion.div>
         ))}
       </div>
