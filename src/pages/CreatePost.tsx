@@ -160,7 +160,7 @@ const CreatePost = () => {
 
         <div className="p-4 rounded-xl bg-primary/5">
           <p className="text-sm text-foreground leading-relaxed">
-            📍 Je product wordt zichtbaar voor buren binnen <strong>12 km</strong>.
+            📍 Je product wordt zichtbaar voor buren binnen <strong>7 km</strong>.
             <br />
             ⏱️ Na 24 uur of bij 100 likes wordt automatisch een winnaar geloot.
           </p>
