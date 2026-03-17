@@ -2,6 +2,7 @@ import { Search, SlidersHorizontal, Loader2, ArrowUpDown, Clock, Heart } from "l
 import PostCard from "@/components/feed/PostCard";
 import { motion } from "framer-motion";
 import { usePosts } from "@/hooks/usePosts";
+import { dummyPosts } from "@/data/dummyPosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
