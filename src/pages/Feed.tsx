@@ -252,25 +252,7 @@ const Feed = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.08 }}
           >
-            <PostCard
-              post={{
-                id: post.id,
-                title: post.title,
-                description: post.description,
-                category: post.category,
-                imageUrl: post.images[0]?.image_url || "/placeholder.svg",
-                images: post.images.map((img) => img.id),
-                likeCount: post.like_count,
-                userHasLiked: post.user_has_liked,
-                status: post.status as any,
-                distance: post.distance_km != null ? `${post.distance_km} km` : "",
-                timeLeft: getTimeLeft(post.raffle_due_at),
-                posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
-                posterAvatar: post.poster?.avatar_url || "",
-                createdAt: post.created_at,
-                displayLocation: post.display_location || "",
-              }}
-            />
+            <PostCard post={post} />
           </motion.div>
         ))}
       </div>
