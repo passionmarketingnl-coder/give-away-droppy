@@ -128,7 +128,8 @@ const Feed = () => {
       </div>
 
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm px-4 pt-4 pb-2">
-        <div className="flex items-center justify-between mb-3">
+        {/* Logo row - hidden on mobile */}
+        <div className="hidden md:flex items-center justify-between mb-3">
           <h1 className="text-2xl font-extrabold text-foreground">
             <span className="text-primary">Droppy</span>
           </h1>
@@ -158,15 +159,38 @@ const Feed = () => {
           className="overflow-hidden transition-all duration-300 ease-in-out"
           style={{ maxHeight: headerVisible ? "200px" : "0px", opacity: headerVisible ? 1 : 0 }}
         >
-          <div className="relative mb-3">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Zoek in je buurt..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-12 pl-11 pr-4 rounded-xl bg-card border border-border text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
+          {/* Search bar + filter button on mobile */}
+          <div className="relative mb-3 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Zoek in je buurt..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-12 pl-11 pr-4 rounded-xl bg-card border border-border text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="md:hidden w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center flex-shrink-0">
+                  <SlidersHorizontal className="w-5 h-5 text-foreground" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Sorteren op</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setSortBy("newest")} className={sortBy === "newest" ? "bg-accent" : ""}>
+                  <Clock className="w-4 h-4 mr-2" /> Nieuwste eerst
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("ending")} className={sortBy === "ending" ? "bg-accent" : ""}>
+                  <ArrowUpDown className="w-4 h-4 mr-2" /> Bijna afgelopen
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortBy("popular")} className={sortBy === "popular" ? "bg-accent" : ""}>
+                  <Heart className="w-4 h-4 mr-2" /> Meeste likes
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
