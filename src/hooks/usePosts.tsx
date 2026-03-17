@@ -18,12 +18,39 @@ export interface Post {
   poster: { first_name: string; last_name: string; avatar_url: string | null } | null;
 }
 
+// Haversine distance in km
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const RADIUS_KM = 7;
+
 export const usePosts = () => {
   const { user } = useAuth();
 
   return useQuery({
     queryKey: ["posts"],
     queryFn: async (): Promise<Post[]> => {
+      // Get current user's coordinates
+      let userLat: number | null = null;
+      let userLng: number | null = null;
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("latitude, longitude")
+          .eq("id", user.id)
+          .single();
+        userLat = profile?.latitude ?? null;
+        userLng = profile?.longitude ?? null;
+      }
+
       const { data: posts, error } = await supabase
         .from("posts")
         .select("*, post_images(*), profiles(first_name, last_name, avatar_url)")
