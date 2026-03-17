@@ -77,21 +77,30 @@ export const usePosts = () => {
         if (l.user_id === user?.id) userLikes[l.post_id] = true;
       });
 
-      const allPosts = (posts || []).map((p) => ({
-        id: p.id,
-        title: p.title,
-        description: p.description,
-        category: p.category,
-        status: p.status,
-        pickup_notes: p.pickup_notes,
-        created_at: p.created_at,
-        raffle_due_at: p.raffle_due_at,
-        user_id: p.user_id,
-        images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
-        like_count: likeCounts[p.id] || 0,
-        user_has_liked: !!userLikes[p.id],
-        poster: p.profiles as any,
-      }));
+      const allPosts = (posts || []).map((p) => {
+        const postLat = p.latitude;
+        const postLng = p.longitude;
+        const dist = (userLat != null && userLng != null && postLat != null && postLng != null)
+          ? Math.round(haversineKm(userLat, userLng, postLat, postLng) * 10) / 10
+          : null;
+        return {
+          id: p.id,
+          title: p.title,
+          description: p.description,
+          category: p.category,
+          status: p.status,
+          pickup_notes: p.pickup_notes,
+          created_at: p.created_at,
+          raffle_due_at: p.raffle_due_at,
+          user_id: p.user_id,
+          images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+          like_count: likeCounts[p.id] || 0,
+          user_has_liked: !!userLikes[p.id],
+          poster: p.profiles as any,
+          display_location: (p as any).display_location || null,
+          distance_km: dist,
+        };
+      });
 
       // Filter by 7km radius if user has coordinates
       if (userLat != null && userLng != null) {
