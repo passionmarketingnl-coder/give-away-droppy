@@ -18,6 +18,7 @@ export interface PostCardData {
   posterName: string;
   posterAvatar: string;
   createdAt: string;
+  displayLocation?: string;
 }
 
 interface PostCardProps {
