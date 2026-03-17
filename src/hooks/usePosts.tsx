@@ -16,6 +16,8 @@ export interface Post {
   like_count: number;
   user_has_liked: boolean;
   poster: { first_name: string; last_name: string; avatar_url: string | null } | null;
+  display_location: string | null;
+  distance_km: number | null;
 }
 
 // Haversine distance in km
