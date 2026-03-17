@@ -18,6 +18,7 @@ export interface PostCardData {
   posterName: string;
   posterAvatar: string;
   createdAt: string;
+  displayLocation?: string;
 }
 
 interface PostCardProps {
@@ -94,10 +95,10 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
 
         <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-          {post.distance && (
+          {(post.distance || post.displayLocation) && (
             <span className="inline-flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5" />
-              {post.distance}
+              {[post.displayLocation, post.distance].filter(Boolean).join(" · ")}
             </span>
           )}
           {post.timeLeft && (

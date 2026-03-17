@@ -245,11 +245,12 @@ const Feed = () => {
                 likeCount: post.like_count,
                 userHasLiked: post.user_has_liked,
                 status: post.status as any,
-                distance: "",
+                distance: post.distance_km != null ? `${post.distance_km} km` : "",
                 timeLeft: getTimeLeft(post.raffle_due_at),
                 posterName: post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend",
                 posterAvatar: post.poster?.avatar_url || "",
                 createdAt: post.created_at,
+                displayLocation: post.display_location || "",
               }}
             />
           </motion.div>
