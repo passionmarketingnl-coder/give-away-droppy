@@ -75,7 +75,7 @@ export const usePosts = () => {
         if (l.user_id === user?.id) userLikes[l.post_id] = true;
       });
 
-      return (posts || []).map((p) => ({
+      const allPosts = (posts || []).map((p) => ({
         id: p.id,
         title: p.title,
         description: p.description,
@@ -90,6 +90,21 @@ export const usePosts = () => {
         user_has_liked: !!userLikes[p.id],
         poster: p.profiles as any,
       }));
+
+      // Filter by 7km radius if user has coordinates
+      if (userLat != null && userLng != null) {
+        return allPosts.filter((post) => {
+          // Show user's own posts regardless of distance
+          if (post.user_id === user?.id) return true;
+          // Posts without coordinates are hidden (legacy data)
+          const postLat = (posts || []).find((pp) => pp.id === post.id)?.latitude;
+          const postLng = (posts || []).find((pp) => pp.id === post.id)?.longitude;
+          if (postLat == null || postLng == null) return true; // Show posts without coords for now
+          return haversineKm(userLat, userLng, postLat, postLng) <= RADIUS_KM;
+        });
+      }
+
+      return allPosts;
     },
   });
 };
