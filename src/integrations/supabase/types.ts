@@ -236,6 +236,7 @@ export type Database = {
           category: string
           created_at: string
           description: string
+          display_location: string | null
           id: string
           latitude: number | null
           longitude: number | null
@@ -252,6 +253,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          display_location?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null
@@ -268,6 +270,7 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
+          display_location?: string | null
           id?: string
           latitude?: number | null
           longitude?: number | null

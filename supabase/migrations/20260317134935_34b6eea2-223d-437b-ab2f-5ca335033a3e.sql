@@ -1,0 +1,1 @@
+ALTER TABLE public.posts ADD COLUMN display_location text;
