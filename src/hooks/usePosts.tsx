@@ -199,14 +199,14 @@ export const useCreatePost = () => {
     }) => {
       if (!user) throw new Error("Not authenticated");
 
-      // Get user profile for coordinates
+      // Get user profile for coordinates and location
       const { data: profile } = await supabase
         .from("profiles")
-        .select("latitude, longitude")
+        .select("latitude, longitude, display_location")
         .eq("id", user.id)
         .single();
 
-      // Create post with user's coordinates
+      // Create post with user's coordinates and location
       const { data: post, error: postError } = await supabase
         .from("posts")
         .insert({
@@ -218,7 +218,8 @@ export const useCreatePost = () => {
           raffle_due_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
           latitude: profile?.latitude || null,
           longitude: profile?.longitude || null,
-        })
+          display_location: profile?.display_location || null,
+        } as any)
         .select()
         .single();
 
