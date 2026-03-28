@@ -64,11 +64,15 @@ export const usePosts = () => {
       // Get like counts and user likes
       const postIds = (posts || []).map((p) => p.id);
 
-      const { data: likes } = await supabase
-        .from("post_likes")
-        .select("post_id, user_id")
-        .in("post_id", postIds.length > 0 ? postIds : ["none"])
-        .eq("is_valid", true);
+      let likes: { post_id: string; user_id: string }[] | null = null;
+      if (postIds.length > 0) {
+        const { data } = await supabase
+          .from("post_likes")
+          .select("post_id, user_id")
+          .in("post_id", postIds)
+          .eq("is_valid", true);
+        likes = data;
+      }
 
       const likeCounts: Record<string, number> = {};
       const userLikes: Record<string, boolean> = {};
