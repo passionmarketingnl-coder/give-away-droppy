@@ -29,8 +29,11 @@ const PostCard = ({ post }: PostCardProps) => {
   const navigate = useNavigate();
   const toggleLike = useToggleLike();
 
+  const isDummy = post.id.startsWith("demo-");
+
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isDummy) return;
     toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
   };
 
