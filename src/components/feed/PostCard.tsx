@@ -47,7 +47,7 @@ const PostCard = ({ post }: PostCardProps) => {
   return (
     <article
       className="bg-card rounded-xl overflow-hidden droppy-shadow tap-highlight-none cursor-pointer"
-      onClick={() => navigate(`/post/${post.id}`)}
+      onClick={() => !isDummy && navigate(`/post/${post.id}`)}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
