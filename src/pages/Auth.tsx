@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import onboardingHero from "@/assets/onboarding-hero.png";
 
-type Step = "welcome" | "login" | "register";
+type Step = "welcome" | "login" | "register" | "verify";
 
 const Auth = () => {
   const [step, setStep] = useState<Step>("welcome");
