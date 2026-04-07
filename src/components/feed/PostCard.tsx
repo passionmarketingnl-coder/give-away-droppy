@@ -1,5 +1,6 @@
 import { Heart, MapPin, Clock, Share2, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
 import StatusBadge, { type StatusType } from "./StatusBadge";
 import { useToggleLike } from "@/hooks/usePosts";
 
