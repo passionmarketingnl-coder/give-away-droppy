@@ -258,6 +258,36 @@ const Auth = () => {
             </button>
           </motion.div>
         )}
+
+        {step === "verify" && (
+          <motion.div
+            key="verify"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-foreground mb-3">Bevestig je e-mail</h2>
+            <p className="text-muted-foreground mb-2 max-w-xs">
+              We hebben een bevestigingslink gestuurd naar:
+            </p>
+            <p className="font-bold text-foreground mb-6">{email}</p>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Klik op de link in de e-mail om je account te activeren. Daarna kun je inloggen.
+            </p>
+            <Button
+              onClick={() => setStep("login")}
+              variant="outline"
+              className="mt-8 h-12 rounded-xl px-8"
+            >
+              Ga naar inloggen
+            </Button>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
