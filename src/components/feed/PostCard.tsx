@@ -68,13 +68,19 @@ const PostCard = ({ post }: PostCardProps) => {
       className="bg-card rounded-xl overflow-hidden droppy-shadow tap-highlight-none cursor-pointer"
       onClick={() => !isDummy && navigate(`/post/${post.id}`)}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden" onClick={handleImageDoubleTap}>
         <img
           src={post.imageUrl}
           alt={post.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover select-none"
           loading="lazy"
+          draggable={false}
         />
+        {showHeartAnim && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <Heart className="w-20 h-20 fill-white text-white drop-shadow-lg animate-heart-pop" />
+          </div>
+        )}
         <div className="absolute top-3 left-3">
           <StatusBadge status={post.status} />
         </div>
