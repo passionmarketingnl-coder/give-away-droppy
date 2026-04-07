@@ -29,6 +29,8 @@ interface PostCardProps {
 const PostCard = ({ post }: PostCardProps) => {
   const navigate = useNavigate();
   const toggleLike = useToggleLike();
+  const lastTapRef = useRef(0);
+  const [showHeartAnim, setShowHeartAnim] = useState(false);
 
   const isDummy = post.id.startsWith("demo-");
 
@@ -36,6 +38,22 @@ const PostCard = ({ post }: PostCardProps) => {
     e.stopPropagation();
     if (isDummy) return;
     toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
+  };
+
+  const handleImageDoubleTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastTapRef.current < 350) {
+      if (isDummy) return;
+      toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
+      if (!post.userHasLiked) {
+        setShowHeartAnim(true);
+        setTimeout(() => setShowHeartAnim(false), 800);
+      }
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
   };
 
   const handleShare = (e: React.MouseEvent) => {
