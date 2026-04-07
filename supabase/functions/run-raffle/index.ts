@@ -96,11 +96,20 @@ Deno.serve(async (req) => {
         trigger_reason: triggerReason,
       });
 
-      await supabase.from("conversations").insert({
+      const { data: convo } = await supabase.from("conversations").insert({
         post_id: post.id,
         poster_user_id: post.user_id,
         winner_user_id: winner.user_id,
-      });
+      }).select("id").single();
+
+      // Auto welcome message from poster
+      if (convo) {
+        await supabase.from("messages").insert({
+          conversation_id: convo.id,
+          sender_user_id: post.user_id,
+          body: `Gefeliciteerd! 🎉 Je hebt "${post.title}" gewonnen. Wanneer kun je het ophalen?`,
+        });
+      }
 
       await supabase.from("notifications").insert({
         user_id: winner.user_id,
