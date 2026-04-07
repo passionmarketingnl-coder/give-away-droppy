@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone, MapPin, Home
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { useToast } from "@/hooks/use-toast";
 import onboardingHero from "@/assets/onboarding-hero.png";
 
