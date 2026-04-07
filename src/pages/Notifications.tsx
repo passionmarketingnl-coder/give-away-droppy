@@ -1,5 +1,7 @@
 import { Heart, MessageCircle, Trophy, RefreshCw, Bell, Loader2 } from "lucide-react";
 import { useNotifications, useMarkNotificationRead } from "@/hooks/useNotifications";
+import { useNavigate } from "react-router-dom";
+import { useConversations } from "@/hooks/useChats";
 import { formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
 
@@ -25,7 +27,36 @@ const colorMap: Record<string, { bg: string; text: string }> = {
 
 const Notifications = () => {
   const { data: notifications, isLoading } = useNotifications();
+  const { data: conversations } = useConversations();
   const markRead = useMarkNotificationRead();
+  const navigate = useNavigate();
+
+  const handleNotificationClick = (notif: any) => {
+    if (!notif.is_read) markRead.mutate(notif.id);
+
+    // For raffle_won and raffle_completed, navigate to the chat for that post
+    if ((notif.type === "raffle_won" || notif.type === "raffle_completed") && notif.post_id) {
+      const convo = conversations?.find((c) => c.post_id === notif.post_id);
+      if (convo) {
+        navigate(`/chat/${convo.id}`);
+        return;
+      }
+    }
+
+    // For chat_message, find the conversation
+    if (notif.type === "chat_message" && notif.post_id) {
+      const convo = conversations?.find((c) => c.post_id === notif.post_id);
+      if (convo) {
+        navigate(`/chat/${convo.id}`);
+        return;
+      }
+    }
+
+    // For comments/replies and other post-related, go to post
+    if (notif.post_id) {
+      navigate(`/post/${notif.post_id}`);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -57,7 +88,7 @@ const Notifications = () => {
             return (
               <button
                 key={notif.id}
-                onClick={() => !notif.is_read && markRead.mutate(notif.id)}
+                onClick={() => handleNotificationClick(notif)}
                 className={`w-full flex items-start gap-3 px-4 py-4 tap-highlight-none text-left ${
                   !notif.is_read ? "bg-primary/5" : ""
                 }`}
