@@ -1,5 +1,6 @@
 import { Heart, MapPin, Clock, Share2, Flame } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRef, useState } from "react";
 import StatusBadge, { type StatusType } from "./StatusBadge";
 import { useToggleLike } from "@/hooks/usePosts";
 
@@ -28,6 +29,8 @@ interface PostCardProps {
 const PostCard = ({ post }: PostCardProps) => {
   const navigate = useNavigate();
   const toggleLike = useToggleLike();
+  const lastTapRef = useRef(0);
+  const [showHeartAnim, setShowHeartAnim] = useState(false);
 
   const isDummy = post.id.startsWith("demo-");
 
@@ -35,6 +38,22 @@ const PostCard = ({ post }: PostCardProps) => {
     e.stopPropagation();
     if (isDummy) return;
     toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
+  };
+
+  const handleImageDoubleTap = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastTapRef.current < 350) {
+      if (isDummy) return;
+      toggleLike.mutate({ postId: post.id, isLiked: post.userHasLiked });
+      if (!post.userHasLiked) {
+        setShowHeartAnim(true);
+        setTimeout(() => setShowHeartAnim(false), 800);
+      }
+      lastTapRef.current = 0;
+    } else {
+      lastTapRef.current = now;
+    }
   };
 
   const handleShare = (e: React.MouseEvent) => {
@@ -49,13 +68,19 @@ const PostCard = ({ post }: PostCardProps) => {
       className="bg-card rounded-xl overflow-hidden droppy-shadow tap-highlight-none cursor-pointer"
       onClick={() => !isDummy && navigate(`/post/${post.id}`)}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden" onClick={handleImageDoubleTap}>
         <img
           src={post.imageUrl}
           alt={post.title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover select-none"
           loading="lazy"
+          draggable={false}
         />
+        {showHeartAnim && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <Heart className="w-20 h-20 fill-white text-white drop-shadow-lg animate-heart-pop" />
+          </div>
+        )}
         <div className="absolute top-3 left-3">
           <StatusBadge status={post.status} />
         </div>
