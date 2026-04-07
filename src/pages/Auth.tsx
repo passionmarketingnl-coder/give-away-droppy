@@ -51,15 +51,19 @@ const Auth = () => {
       toast({ title: "Registratie mislukt", description: error.message, variant: "destructive" });
       return;
     }
-    // Geocode address in background
-    if (data.session) {
-      try {
-        await supabase.functions.invoke("geocode-address", {
-          body: { postcode: cleanPostcode, house_number: houseNumber },
-        });
-      } catch (e) {
-        console.warn("Geocoding failed, can be retried later", e);
-      }
+    // If no session, email confirmation is required
+    if (!data.session) {
+      setLoading(false);
+      setStep("verify");
+      return;
+    }
+    // Geocode address in background (only if auto-confirmed / session exists)
+    try {
+      await supabase.functions.invoke("geocode-address", {
+        body: { postcode: cleanPostcode, house_number: houseNumber },
+      });
+    } catch (e) {
+      console.warn("Geocoding failed, can be retried later", e);
     }
     setLoading(false);
     toast({ title: "Account aangemaakt!", description: "Je bent nu ingelogd." });
