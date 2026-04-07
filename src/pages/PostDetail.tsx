@@ -1,18 +1,37 @@
-import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2, Flame } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2, Flame, Trophy, CheckCircle, RefreshCw } from "lucide-react";
 import CommentsSection from "@/components/post/CommentsSection";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/feed/StatusBadge";
 import { usePost, useToggleLike } from "@/hooks/usePosts";
+import { useConfirmPickup, useReroll } from "@/hooks/usePostActions";
+import { useConversations } from "@/hooks/useChats";
+import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { nl } from "date-fns/locale";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const PostDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user } = useAuth();
   const { data: post, isLoading } = usePost(id || "");
+  const { data: conversations } = useConversations();
   const toggleLike = useToggleLike();
+  const confirmPickup = useConfirmPickup();
+  const reroll = useReroll();
   const [currentImage, setCurrentImage] = useState(0);
 
   if (isLoading) {
@@ -36,8 +55,49 @@ const PostDetail = () => {
   const posterInitial = post.poster ? post.poster.first_name.charAt(0).toUpperCase() : "?";
   const posterName = post.poster ? `${post.poster.first_name} ${post.poster.last_name.charAt(0)}.` : "Onbekend";
 
+  const isPoster = user?.id === post.user_id;
+  const isRaffled = post.status === "raffled" || post.status === "reroll";
+  const isPickedUp = post.status === "picked_up";
+
+  // Find conversation for this post
+  const conversation = conversations?.find((c) => c.post_id === post.id);
+
   const handleLike = () => {
     toggleLike.mutate({ postId: post.id, isLiked: post.user_has_liked });
+  };
+
+  const handleShare = async () => {
+    const url = `${window.location.origin}/post/${post.id}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: post.title, text: `Bekijk "${post.title}" op Droppy!`, url });
+      } catch {
+        // User cancelled share
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link gekopieerd!");
+    }
+  };
+
+  const handleConfirmPickup = () => {
+    confirmPickup.mutate(post.id, {
+      onSuccess: () => toast.success("Ophaling bevestigd! 🎉"),
+      onError: (e) => toast.error(e.message),
+    });
+  };
+
+  const handleReroll = () => {
+    reroll.mutate(post.id, {
+      onSuccess: () => toast.success("Nieuwe winnaar gekozen!"),
+      onError: (e) => toast.error(e.message),
+    });
+  };
+
+  const handleGoToChat = () => {
+    if (conversation) {
+      navigate(`/chat/${conversation.id}`);
+    }
   };
 
   return (
@@ -54,7 +114,10 @@ const PostDetail = () => {
         >
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
-        <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
+        <button
+          onClick={handleShare}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center"
+        >
           <Share2 className="w-5 h-5 text-foreground" />
         </button>
         {images.length > 1 && (
@@ -92,6 +155,7 @@ const PostDetail = () => {
           </span>
         </div>
 
+        {/* Raffle progress bar */}
         {(() => {
           const isOldEnough = (Date.now() - new Date(post.created_at).getTime()) >= 4 * 60 * 60 * 1000;
           const likesNeeded = 100 - post.like_count;
@@ -115,6 +179,91 @@ const PostDetail = () => {
             </div>
           );
         })()}
+
+        {/* Winner banner — shown when raffled */}
+        {isRaffled && (
+          <div className="p-4 rounded-xl bg-droppy-gold/10 border border-droppy-gold/30 space-y-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-droppy-gold" />
+              <span className="font-bold text-foreground">Loting afgerond!</span>
+            </div>
+            {isPoster ? (
+              <p className="text-sm text-muted-foreground">
+                Er is een winnaar gekozen. Neem contact op via de chat om de ophaling te regelen.
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                De loting voor dit item is afgerond. De winnaar is op de hoogte gesteld.
+              </p>
+            )}
+            {conversation && (
+              <Button onClick={handleGoToChat} className="w-full rounded-xl" variant="outline">
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Open chat
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Picked up banner */}
+        {isPickedUp && (
+          <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-primary" />
+              <span className="font-bold text-foreground">Opgehaald!</span>
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Dit item is succesvol opgehaald. Bedankt voor het delen!
+            </p>
+          </div>
+        )}
+
+        {/* Poster actions for raffled posts */}
+        {isPoster && isRaffled && (
+          <div className="space-y-3">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="w-full h-12 rounded-xl font-bold" disabled={confirmPickup.isPending}>
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  {confirmPickup.isPending ? "Bezig..." : "Bevestig ophaling"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Ophaling bevestigen?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Hiermee bevestig je dat het item is opgehaald door de winnaar. Dit kan niet ongedaan worden gemaakt.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleConfirmPickup}>Bevestigen</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="w-full h-12 rounded-xl font-bold text-destructive border-destructive/30 hover:bg-destructive/5" disabled={reroll.isPending}>
+                  <RefreshCw className="w-5 h-5 mr-2" />
+                  {reroll.isPending ? "Bezig..." : "Herverloting starten"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Herverloting starten?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Reageerde de winnaar niet? Er wordt een nieuwe winnaar gekozen uit de overige deelnemers. De vorige winnaar wordt uitgesloten.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleReroll}>Herverloten</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        )}
 
         <div className="flex items-center gap-3 py-3 border-y border-border">
           <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">
@@ -149,18 +298,21 @@ const PostDetail = () => {
         </button>
       </div>
 
-      <div className="sticky bottom-0 px-4 py-4 bg-background/95 backdrop-blur-sm border-t border-border safe-bottom">
-        <Button
-          onClick={handleLike}
-          className={`w-full h-14 text-base font-bold rounded-xl transition-all ${
-            post.user_has_liked ? "bg-accent hover:bg-accent/90" : ""
-          }`}
-          size="lg"
-        >
-          <Heart className={`w-5 h-5 mr-2 ${post.user_has_liked ? "fill-current" : ""}`} />
-          {post.user_has_liked ? "Je doet mee! 🎉" : "Doe mee aan de loting"}
-        </Button>
-      </div>
+      {/* Bottom action bar — only for active/ending posts */}
+      {(post.status === "active" || post.status === "ending") && (
+        <div className="sticky bottom-0 px-4 py-4 bg-background/95 backdrop-blur-sm border-t border-border safe-bottom">
+          <Button
+            onClick={handleLike}
+            className={`w-full h-14 text-base font-bold rounded-xl transition-all ${
+              post.user_has_liked ? "bg-accent hover:bg-accent/90" : ""
+            }`}
+            size="lg"
+          >
+            <Heart className={`w-5 h-5 mr-2 ${post.user_has_liked ? "fill-current" : ""}`} />
+            {post.user_has_liked ? "Je doet mee! 🎉" : "Doe mee aan de loting"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
