@@ -28,6 +28,20 @@ const Auth = () => {
     exit: { x: -50, opacity: 0 },
   };
 
+  const handleSocialLogin = async (provider: "google" | "apple") => {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth(provider, {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setLoading(false);
+      toast({ title: "Inloggen mislukt", description: String(result.error), variant: "destructive" });
+      return;
+    }
+    if (result.redirected) return;
+    setLoading(false);
+  };
+
   const handleLogin = async () => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
