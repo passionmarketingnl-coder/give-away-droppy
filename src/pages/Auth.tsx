@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import onboardingHero from "@/assets/onboarding-hero.png";
 
-type Step = "welcome" | "login" | "register";
+type Step = "welcome" | "login" | "register" | "verify";
 
 const Auth = () => {
   const [step, setStep] = useState<Step>("welcome");
@@ -51,15 +51,19 @@ const Auth = () => {
       toast({ title: "Registratie mislukt", description: error.message, variant: "destructive" });
       return;
     }
-    // Geocode address in background
-    if (data.session) {
-      try {
-        await supabase.functions.invoke("geocode-address", {
-          body: { postcode: cleanPostcode, house_number: houseNumber },
-        });
-      } catch (e) {
-        console.warn("Geocoding failed, can be retried later", e);
-      }
+    // If no session, email confirmation is required
+    if (!data.session) {
+      setLoading(false);
+      setStep("verify");
+      return;
+    }
+    // Geocode address in background (only if auto-confirmed / session exists)
+    try {
+      await supabase.functions.invoke("geocode-address", {
+        body: { postcode: cleanPostcode, house_number: houseNumber },
+      });
+    } catch (e) {
+      console.warn("Geocoding failed, can be retried later", e);
     }
     setLoading(false);
     toast({ title: "Account aangemaakt!", description: "Je bent nu ingelogd." });
@@ -252,6 +256,36 @@ const Auth = () => {
             >
               Al een account? Log in
             </button>
+          </motion.div>
+        )}
+
+        {step === "verify" && (
+          <motion.div
+            key="verify"
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="flex-1 flex flex-col items-center justify-center px-6 py-12 text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-2xl font-extrabold text-foreground mb-3">Bevestig je e-mail</h2>
+            <p className="text-muted-foreground mb-2 max-w-xs">
+              We hebben een bevestigingslink gestuurd naar:
+            </p>
+            <p className="font-bold text-foreground mb-6">{email}</p>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Klik op de link in de e-mail om je account te activeren. Daarna kun je inloggen.
+            </p>
+            <Button
+              onClick={() => setStep("login")}
+              variant="outline"
+              className="mt-8 h-12 rounded-xl px-8"
+            >
+              Ga naar inloggen
+            </Button>
           </motion.div>
         )}
       </AnimatePresence>
