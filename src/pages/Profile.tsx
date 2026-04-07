@@ -38,8 +38,12 @@ const Profile = () => {
         <h1 className="text-2xl font-extrabold text-foreground mb-6">Profiel</h1>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-primary font-extrabold text-3xl">{initials}</span>
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+            {user?.user_metadata?.avatar_url ? (
+              <img src={user.user_metadata.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-primary font-extrabold text-3xl">{initials}</span>
+            )}
           </div>
           <div>
             <h2 className="text-xl font-extrabold text-foreground">{displayName}</h2>
@@ -128,6 +132,14 @@ const Profile = () => {
       </div>
 
       <div className="px-4 mt-4 space-y-2 pb-8">
+        <button
+          onClick={() => navigate("/profile/edit")}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
+        >
+          <Edit3 className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-left font-semibold text-foreground">Profiel bewerken</span>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
         <button
           onClick={signOut}
           className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
