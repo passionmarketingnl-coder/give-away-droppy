@@ -1,4 +1,5 @@
-import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, Flag, ChevronRight, Loader2, Flame, Trophy, CheckCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Heart, Share2, MapPin, Clock, MessageCircle, ChevronRight, Loader2, Flame, Trophy, CheckCircle, RefreshCw } from "lucide-react";
+import ReportDialog from "@/components/post/ReportDialog";
 import CommentsSection from "@/components/post/CommentsSection";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
@@ -292,10 +293,7 @@ const PostDetail = () => {
 
         <CommentsSection postId={post.id} />
 
-        <button className="flex items-center gap-2 text-sm text-muted-foreground py-2">
-          <Flag className="w-4 h-4" />
-          Meld dit product
-        </button>
+        <ReportDialog postId={post.id} />
       </div>
 
       {/* Bottom action bar — only for active/ending posts */}
