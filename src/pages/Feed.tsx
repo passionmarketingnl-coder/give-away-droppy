@@ -93,6 +93,15 @@ const Feed = () => {
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const getTimeLeft = (raffleAt: string | null) => {
+    if (!raffleAt) return "";
+    const diff = new Date(raffleAt).getTime() - Date.now();
+    if (diff <= 0) return "Verlopen";
+    const hours = Math.floor(diff / 3600000);
+    if (hours > 0) return `${hours}u over`;
+    return `${Math.floor(diff / 60000)}m over`;
+  };
+
   const hasPosts = (posts || []).length > 0;
   const feedItems = hasPosts
     ? (posts || []).map((post) => ({
@@ -123,15 +132,6 @@ const Feed = () => {
     if (sortBy === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     return 0;
   });
-
-  const getTimeLeft = (raffleAt: string | null) => {
-    if (!raffleAt) return "";
-    const diff = new Date(raffleAt).getTime() - Date.now();
-    if (diff <= 0) return "Verlopen";
-    const hours = Math.floor(diff / 3600000);
-    if (hours > 0) return `${hours}u over`;
-    return `${Math.floor(diff / 60000)}m over`;
-  };
 
   return (
     <div className="flex flex-col">
