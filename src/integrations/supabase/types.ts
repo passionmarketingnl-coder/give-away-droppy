@@ -427,6 +427,42 @@ export type Database = {
           },
         ]
       }
+      user_consents: {
+        Row: {
+          created_at: string
+          id: string
+          privacy_accepted: boolean
+          privacy_accepted_at: string | null
+          privacy_version: string
+          terms_accepted: boolean
+          terms_accepted_at: string | null
+          terms_version: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          privacy_accepted?: boolean
+          privacy_accepted_at?: string | null
+          privacy_version?: string
+          terms_accepted?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          privacy_accepted?: boolean
+          privacy_accepted_at?: string | null
+          privacy_version?: string
+          terms_accepted?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
