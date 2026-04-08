@@ -27,13 +27,10 @@ export const useComments = (postId: string) => {
       if (!data || data.length === 0) return [];
 
       const userIds = [...new Set(data.map((c) => c.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .in("id", userIds);
+      const { data: profiles } = await supabase.rpc("get_public_profiles", { user_ids: userIds });
 
       const profileMap = Object.fromEntries(
-        (profiles || []).map((p) => [p.id, p])
+        (profiles || []).map((p: any) => [p.id, p])
       );
 
       return data.map((c) => {

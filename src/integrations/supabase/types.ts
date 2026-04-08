@@ -468,7 +468,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_public_profiles: {
+        Args: { user_ids: string[] }
+        Returns: {
+          avatar_url: string
+          display_location: string
+          first_name: string
+          id: string
+          last_name: string
+        }[]
+      }
     }
     Enums: {
       conversation_status: "open" | "pickup_planned" | "completed"
