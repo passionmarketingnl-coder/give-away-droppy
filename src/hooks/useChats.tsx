@@ -70,12 +70,9 @@ export const useConversations = () => {
       const otherUserIds = [...new Set(convos.map((c) =>
         c.poster_user_id === user.id ? c.winner_user_id : c.poster_user_id
       ))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .in("id", otherUserIds);
+      const { data: profiles } = await supabase.rpc("get_public_profiles", { user_ids: otherUserIds });
       const profileMap = Object.fromEntries(
-        (profiles || []).map((p) => [p.id, p])
+        (profiles || []).map((p: any) => [p.id, p])
       );
 
       // Get last message per conversation

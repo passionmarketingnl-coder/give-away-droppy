@@ -55,7 +55,7 @@ export const usePosts = () => {
 
       const { data: posts, error } = await supabase
         .from("posts")
-        .select("*, post_images(*), profiles(first_name, last_name, avatar_url)")
+        .select("*, post_images(*)")
         .in("status", ["active", "ending"])
         .order("created_at", { ascending: false });
 
@@ -81,12 +81,22 @@ export const usePosts = () => {
         if (l.user_id === user?.id) userLikes[l.post_id] = true;
       });
 
+      // Fetch poster profiles via RPC
+      const posterIds = [...new Set((posts || []).map((p) => p.user_id))];
+      const { data: posterProfiles } = posterIds.length > 0
+        ? await supabase.rpc("get_public_profiles", { user_ids: posterIds })
+        : { data: [] };
+      const posterMap = Object.fromEntries(
+        (posterProfiles || []).map((p: any) => [p.id, p])
+      );
+
       const allPosts = (posts || []).map((p) => {
         const postLat = p.latitude;
         const postLng = p.longitude;
         const dist = (userLat != null && userLng != null && postLat != null && postLng != null)
           ? Math.round(haversineKm(userLat, userLng, postLat, postLng) * 10) / 10
           : null;
+        const poster = posterMap[p.user_id];
         return {
           id: p.id,
           title: p.title,
@@ -100,7 +110,7 @@ export const usePosts = () => {
           images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
           like_count: likeCounts[p.id] || 0,
           user_has_liked: !!userLikes[p.id],
-          poster: p.profiles as any,
+          poster: poster ? { first_name: poster.first_name, last_name: poster.last_name, avatar_url: poster.avatar_url } : null,
           display_location: (p as any).display_location || null,
           distance_km: dist,
         };
@@ -132,21 +142,21 @@ export const usePost = (id: string) => {
     queryFn: async (): Promise<Post | null> => {
       const { data: p, error } = await supabase
         .from("posts")
-        .select("*, post_images(*), profiles(first_name, last_name, avatar_url)")
+        .select("*, post_images(*)")
         .eq("id", id)
         .single();
 
       if (error) throw error;
       if (!p) return null;
 
-      const { data: likes } = await supabase
-        .from("post_likes")
-        .select("user_id")
-        .eq("post_id", id)
-        .eq("is_valid", true);
+      const [{ data: likes }, { data: posterProfiles }] = await Promise.all([
+        supabase.from("post_likes").select("user_id").eq("post_id", id).eq("is_valid", true),
+        supabase.rpc("get_public_profiles", { user_ids: [p.user_id] }),
+      ]);
 
       const likeCount = likes?.length || 0;
       const userLiked = likes?.some((l) => l.user_id === user?.id) || false;
+      const poster = posterProfiles?.[0] || null;
 
       return {
         id: p.id,
@@ -161,7 +171,7 @@ export const usePost = (id: string) => {
         images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
         like_count: likeCount,
         user_has_liked: userLiked,
-        poster: p.profiles as any,
+        poster: poster ? { first_name: poster.first_name, last_name: poster.last_name, avatar_url: poster.avatar_url } : null,
         display_location: (p as any).display_location || null,
         distance_km: null,
       };
