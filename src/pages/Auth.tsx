@@ -73,6 +73,20 @@ const Auth = () => {
       toast({ title: "Registratie mislukt", description: error.message, variant: "destructive" });
       return;
     }
+    // Save consent record
+    const userId = data.user?.id;
+    if (userId) {
+      const now = new Date().toISOString();
+      await supabase.from("user_consents").insert({
+        user_id: userId,
+        terms_accepted: true,
+        terms_accepted_at: now,
+        terms_version: "1.1",
+        privacy_accepted: true,
+        privacy_accepted_at: now,
+        privacy_version: "1.1",
+      });
+    }
     // If no session, email confirmation is required
     if (!data.session) {
       setLoading(false);
