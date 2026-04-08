@@ -291,6 +291,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "posts_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -465,7 +472,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_location: string | null
+          first_name: string | null
+          id: string | null
+          is_banned: boolean | null
+          last_name: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_location?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_banned?: boolean | null
+          last_name?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_location?: string | null
+          first_name?: string | null
+          id?: string | null
+          is_banned?: boolean | null
+          last_name?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
