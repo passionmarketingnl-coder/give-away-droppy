@@ -23,6 +23,10 @@ const Auth = () => {
   const [postcode, setPostcode] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const { toast } = useToast();
 
   const slideVariants = {
