@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone, MapPin, Home } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import TermsSheet from "@/components/legal/TermsSheet";
+import PrivacySheet from "@/components/legal/PrivacySheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +23,10 @@ const Auth = () => {
   const [postcode, setPostcode] = useState("");
   const [houseNumber, setHouseNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const { toast } = useToast();
 
   const slideVariants = {
@@ -65,6 +72,20 @@ const Auth = () => {
       setLoading(false);
       toast({ title: "Registratie mislukt", description: error.message, variant: "destructive" });
       return;
+    }
+    // Save consent record
+    const userId = data.user?.id;
+    if (userId) {
+      const now = new Date().toISOString();
+      await supabase.from("user_consents").insert({
+        user_id: userId,
+        terms_accepted: true,
+        terms_accepted_at: now,
+        terms_version: "1.1",
+        privacy_accepted: true,
+        privacy_accepted_at: now,
+        privacy_version: "1.1",
+      });
     }
     // If no session, email confirmation is required
     if (!data.session) {
@@ -283,10 +304,52 @@ const Auth = () => {
                 />
               </div>
             </div>
+
+            {/* Consent checkboxes */}
+            <div className="space-y-3 mt-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="terms" className="text-sm text-foreground leading-snug">
+                  Ik ga akkoord met de{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setTermsOpen(true); }}
+                    className="text-primary font-semibold underline"
+                  >
+                    Algemene Voorwaarden
+                  </button>
+                </label>
+              </div>
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="privacy"
+                  checked={privacyAccepted}
+                  onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="privacy" className="text-sm text-foreground leading-snug">
+                  Ik heb het{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setPrivacyOpen(true); }}
+                    className="text-primary font-semibold underline"
+                  >
+                    Privacybeleid
+                  </button>{" "}
+                  gelezen en ga hiermee akkoord
+                </label>
+              </div>
+            </div>
+
             <Button
               onClick={handleRegister}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={!email || !password || !firstName || !lastName || !phone || !postcode || !houseNumber || loading}
+              disabled={!email || !password || !firstName || !lastName || !phone || !postcode || !houseNumber || !termsAccepted || !privacyAccepted || loading}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registreren"}
             </Button>
@@ -354,6 +417,8 @@ const Auth = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
+      <PrivacySheet open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </div>
   );
 };

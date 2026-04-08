@@ -1,8 +1,10 @@
-import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2, Heart } from "lucide-react";
+import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2, Heart, FileText, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyPosts, useWonPosts, useLikedPosts } from "@/hooks/useProfile";
 import { useState } from "react";
+import TermsSheet from "@/components/legal/TermsSheet";
+import PrivacySheet from "@/components/legal/PrivacySheet";
 
 const statusLabels: Record<string, string> = {
   active: "Actief",
@@ -20,6 +22,8 @@ const Profile = () => {
   const { data: wonPosts, isLoading: wonLoading } = useWonPosts();
   const { data: likedPosts, isLoading: likedLoading } = useLikedPosts();
   const [tab, setTab] = useState<"given" | "won" | "liked">("given");
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   const displayName = user?.user_metadata?.first_name
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
@@ -147,7 +151,25 @@ const Profile = () => {
           <LogOut className="w-5 h-5 text-muted-foreground" />
           <span className="flex-1 text-left font-semibold text-foreground">Uitloggen</span>
         </button>
+        <button
+          onClick={() => setTermsOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
+        >
+          <FileText className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-left font-semibold text-foreground">Algemene Voorwaarden</span>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
+        <button
+          onClick={() => setPrivacyOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
+        >
+          <Shield className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-left font-semibold text-foreground">Privacybeleid</span>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
       </div>
+      <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
+      <PrivacySheet open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </div>
   );
 };
