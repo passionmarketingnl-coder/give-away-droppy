@@ -304,10 +304,52 @@ const Auth = () => {
                 />
               </div>
             </div>
+
+            {/* Consent checkboxes */}
+            <div className="space-y-3 mt-4">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="terms"
+                  checked={termsAccepted}
+                  onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="terms" className="text-sm text-foreground leading-snug">
+                  Ik ga akkoord met de{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setTermsOpen(true); }}
+                    className="text-primary font-semibold underline"
+                  >
+                    Algemene Voorwaarden
+                  </button>
+                </label>
+              </div>
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="privacy"
+                  checked={privacyAccepted}
+                  onCheckedChange={(checked) => setPrivacyAccepted(checked === true)}
+                  className="mt-0.5"
+                />
+                <label htmlFor="privacy" className="text-sm text-foreground leading-snug">
+                  Ik heb het{" "}
+                  <button
+                    type="button"
+                    onClick={(e) => { e.preventDefault(); setPrivacyOpen(true); }}
+                    className="text-primary font-semibold underline"
+                  >
+                    Privacybeleid
+                  </button>{" "}
+                  gelezen en ga hiermee akkoord
+                </label>
+              </div>
+            </div>
+
             <Button
               onClick={handleRegister}
               className="w-full mt-6 h-14 text-base font-bold rounded-xl"
-              disabled={!email || !password || !firstName || !lastName || !phone || !postcode || !houseNumber || loading}
+              disabled={!email || !password || !firstName || !lastName || !phone || !postcode || !houseNumber || !termsAccepted || !privacyAccepted || loading}
             >
               {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registreren"}
             </Button>
