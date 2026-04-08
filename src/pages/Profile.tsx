@@ -22,6 +22,8 @@ const Profile = () => {
   const { data: wonPosts, isLoading: wonLoading } = useWonPosts();
   const { data: likedPosts, isLoading: likedLoading } = useLikedPosts();
   const [tab, setTab] = useState<"given" | "won" | "liked">("given");
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   const displayName = user?.user_metadata?.first_name
     ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
