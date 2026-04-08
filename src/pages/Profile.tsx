@@ -1,8 +1,10 @@
-import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2, Heart } from "lucide-react";
+import { ChevronRight, MapPin, Package, Trophy, LogOut, Trash2, Edit3, Loader2, Heart, FileText, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useMyPosts, useWonPosts, useLikedPosts } from "@/hooks/useProfile";
 import { useState } from "react";
+import TermsSheet from "@/components/legal/TermsSheet";
+import PrivacySheet from "@/components/legal/PrivacySheet";
 
 const statusLabels: Record<string, string> = {
   active: "Actief",

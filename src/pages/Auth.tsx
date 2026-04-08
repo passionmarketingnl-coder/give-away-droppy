@@ -417,6 +417,8 @@ const Auth = () => {
           </motion.div>
         )}
       </AnimatePresence>
+      <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
+      <PrivacySheet open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </div>
   );
 };
