@@ -151,7 +151,25 @@ const Profile = () => {
           <LogOut className="w-5 h-5 text-muted-foreground" />
           <span className="flex-1 text-left font-semibold text-foreground">Uitloggen</span>
         </button>
+        <button
+          onClick={() => setTermsOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
+        >
+          <FileText className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-left font-semibold text-foreground">Algemene Voorwaarden</span>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
+        <button
+          onClick={() => setPrivacyOpen(true)}
+          className="w-full flex items-center gap-3 px-4 py-4 bg-card rounded-xl tap-highlight-none"
+        >
+          <Shield className="w-5 h-5 text-muted-foreground" />
+          <span className="flex-1 text-left font-semibold text-foreground">Privacybeleid</span>
+          <ChevronRight className="w-5 h-5 text-muted-foreground" />
+        </button>
       </div>
+      <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
+      <PrivacySheet open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </div>
   );
 };
