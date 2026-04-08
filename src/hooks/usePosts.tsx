@@ -64,22 +64,15 @@ export const usePosts = () => {
       // Get like counts and user likes
       const postIds = (posts || []).map((p) => p.id);
 
-      let likes: { post_id: string; user_id: string }[] | null = null;
-      if (postIds.length > 0) {
-        const { data } = await supabase
-          .from("post_likes")
-          .select("post_id, user_id")
-          .in("post_id", postIds)
-          .eq("is_valid", true);
-        likes = data;
-      }
-
       const likeCounts: Record<string, number> = {};
       const userLikes: Record<string, boolean> = {};
-      (likes || []).forEach((l) => {
-        likeCounts[l.post_id] = (likeCounts[l.post_id] || 0) + 1;
-        if (l.user_id === user?.id) userLikes[l.post_id] = true;
-      });
+      if (postIds.length > 0) {
+        const { data: likesInfo } = await supabase.rpc("get_post_likes_info", { p_post_ids: postIds });
+        (likesInfo || []).forEach((l: any) => {
+          likeCounts[l.post_id] = Number(l.like_count) || 0;
+          if (l.user_liked) userLikes[l.post_id] = true;
+        });
+      }
 
       // Fetch poster profiles via RPC
       const posterIds = [...new Set((posts || []).map((p) => p.user_id))];
@@ -149,13 +142,14 @@ export const usePost = (id: string) => {
       if (error) throw error;
       if (!p) return null;
 
-      const [{ data: likes }, { data: posterProfiles }] = await Promise.all([
-        supabase.from("post_likes").select("user_id").eq("post_id", id).eq("is_valid", true),
+      const [{ data: likesInfo }, { data: posterProfiles }] = await Promise.all([
+        supabase.rpc("get_post_likes_info", { p_post_ids: [id] }),
         supabase.rpc("get_public_profiles", { user_ids: [p.user_id] }),
       ]);
 
-      const likeCount = likes?.length || 0;
-      const userLiked = likes?.some((l) => l.user_id === user?.id) || false;
+      const likeData = likesInfo?.[0];
+      const likeCount = Number(likeData?.like_count) || 0;
+      const userLiked = likeData?.user_liked || false;
       const poster = posterProfiles?.[0] || null;
 
       return {

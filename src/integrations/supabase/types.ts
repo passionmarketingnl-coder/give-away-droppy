@@ -468,6 +468,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_post_likes_info: {
+        Args: { p_post_ids: string[] }
+        Returns: {
+          like_count: number
+          post_id: string
+          user_liked: boolean
+        }[]
+      }
       get_public_profiles: {
         Args: { user_ids: string[] }
         Returns: {
