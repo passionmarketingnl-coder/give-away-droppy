@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, CheckCircle, Loader2, Mail, Lock, User, Phone, MapPin, Home } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import TermsSheet from "@/components/legal/TermsSheet";
+import PrivacySheet from "@/components/legal/PrivacySheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
