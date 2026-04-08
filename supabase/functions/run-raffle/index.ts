@@ -111,21 +111,38 @@ Deno.serve(async (req) => {
         });
       }
 
+      // Notify winner (notification 6)
       await supabase.from("notifications").insert({
         user_id: winner.user_id,
         type: "raffle_won",
-        title: "Je hebt gewonnen! 🎉",
-        body: `Je hebt "${post.title}" gewonnen. Regel het ophalen via de chat.`,
+        title: "Gefeliciteerd, jij wint! 🎉",
+        body: `Jij wint ${post.title}! Neem contact op met de aanbieder om de ophaling te regelen.`,
         post_id: post.id,
       });
 
+      // Notify poster
       await supabase.from("notifications").insert({
         user_id: post.user_id,
         type: "raffle_completed",
-        title: "Loting voltooid",
-        body: `De loting voor "${post.title}" is afgerond. Bekijk de winnaar in je chats.`,
+        title: "Loting afgerond 🎲",
+        body: `De loting van ${post.title} is afgerond!`,
         post_id: post.id,
       });
+
+      // Notify all other participants (notification 5)
+      const otherParticipants = participants.filter(
+        (p) => p.user_id !== winner.user_id
+      );
+      if (otherParticipants.length > 0) {
+        const participantNotifications = otherParticipants.map((p) => ({
+          user_id: p.user_id,
+          type: "raffle_completed" as const,
+          title: "Loting afgerond 🎲",
+          body: `De loting van ${post.title} is afgerond!`,
+          post_id: post.id,
+        }));
+        await supabase.from("notifications").insert(participantNotifications);
+      }
 
       results.push({
         post_id: post.id,

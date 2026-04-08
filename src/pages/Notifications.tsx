@@ -1,4 +1,4 @@
-import { Heart, MessageCircle, Trophy, RefreshCw, Bell, Loader2 } from "lucide-react";
+import { Heart, MessageCircle, Trophy, RefreshCw, Bell, Loader2, MapPin, CheckCircle, Dice5 } from "lucide-react";
 import { useNotifications, useMarkNotificationRead } from "@/hooks/useNotifications";
 import { useNavigate } from "react-router-dom";
 import { useConversations } from "@/hooks/useChats";
@@ -9,10 +9,12 @@ const iconMap: Record<string, any> = {
   raffle_won: Trophy,
   comment: MessageCircle,
   reply: MessageCircle,
-  raffle_completed: Heart,
+  raffle_completed: Dice5,
   reroll: RefreshCw,
   chat_message: MessageCircle,
   moderation: Bell,
+  daily_update: MapPin,
+  pickup_confirm: CheckCircle,
 };
 
 const colorMap: Record<string, { bg: string; text: string }> = {
@@ -23,6 +25,8 @@ const colorMap: Record<string, { bg: string; text: string }> = {
   reroll: { bg: "bg-accent/10", text: "text-accent" },
   chat_message: { bg: "bg-primary/10", text: "text-primary" },
   moderation: { bg: "bg-destructive/10", text: "text-destructive" },
+  daily_update: { bg: "bg-primary/10", text: "text-primary" },
+  pickup_confirm: { bg: "bg-droppy-gold/15", text: "text-droppy-gold" },
 };
 
 const Notifications = () => {
@@ -34,8 +38,14 @@ const Notifications = () => {
   const handleNotificationClick = (notif: any) => {
     if (!notif.is_read) markRead.mutate(notif.id);
 
-    // For raffle_won and raffle_completed, navigate to the chat for that post
-    if ((notif.type === "raffle_won" || notif.type === "raffle_completed") && notif.post_id) {
+    // daily_update → feed
+    if (notif.type === "daily_update") {
+      navigate("/");
+      return;
+    }
+
+    // raffle_won → chat for that post
+    if (notif.type === "raffle_won" && notif.post_id) {
       const convo = conversations?.find((c) => c.post_id === notif.post_id);
       if (convo) {
         navigate(`/chat/${convo.id}`);
@@ -43,7 +53,7 @@ const Notifications = () => {
       }
     }
 
-    // For chat_message, find the conversation
+    // chat_message → chat for that post
     if (notif.type === "chat_message" && notif.post_id) {
       const convo = conversations?.find((c) => c.post_id === notif.post_id);
       if (convo) {
@@ -52,7 +62,16 @@ const Notifications = () => {
       }
     }
 
-    // For comments/replies and other post-related, go to post
+    // raffle_completed → navigate to chat if poster, else post
+    if (notif.type === "raffle_completed" && notif.post_id) {
+      const convo = conversations?.find((c) => c.post_id === notif.post_id);
+      if (convo) {
+        navigate(`/chat/${convo.id}`);
+        return;
+      }
+    }
+
+    // For comments/replies/pickup_confirm and other post-related, go to post
     if (notif.post_id) {
       navigate(`/post/${notif.post_id}`);
     }
