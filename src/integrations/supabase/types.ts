@@ -444,6 +444,8 @@ export type Database = {
         | "chat_message"
         | "reroll"
         | "moderation"
+        | "daily_update"
+        | "pickup_confirm"
       post_status:
         | "active"
         | "ending"
@@ -588,6 +590,8 @@ export const Constants = {
         "chat_message",
         "reroll",
         "moderation",
+        "daily_update",
+        "pickup_confirm",
       ],
       post_status: [
         "active",
