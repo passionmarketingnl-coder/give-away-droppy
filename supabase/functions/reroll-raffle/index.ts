@@ -60,6 +60,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Verify caller is the post owner
+    if (post.user_id !== user.id) {
+      return new Response(JSON.stringify({ error: "Niet geautoriseerd" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (!["raffled", "reroll"].includes(post.status)) {
       return new Response(
         JSON.stringify({ error: "Post kan niet herverdeeld worden" }),
