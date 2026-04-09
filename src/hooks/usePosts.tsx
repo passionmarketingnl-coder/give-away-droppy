@@ -20,20 +20,6 @@ export interface Post {
   distance_km: number | null;
 }
 
-// Haversine distance in km
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const R = 6371;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-const RADIUS_KM = 7;
-
 export const usePosts = () => {
   const { user } = useAuth();
 
@@ -53,17 +39,31 @@ export const usePosts = () => {
         userLng = profile?.longitude ?? null;
       }
 
-      const { data: posts, error } = await supabase
-        .from("posts")
-        .select("*, post_images(*)")
-        .in("status", ["active", "ending"])
-        .order("created_at", { ascending: false });
+      // Use secure RPC that masks sensitive fields and computes distance server-side
+      const { data: posts, error } = await supabase.rpc("get_feed_posts", {
+        p_user_lat: userLat,
+        p_user_lng: userLng,
+        p_radius_km: 7,
+      });
 
       if (error) throw error;
+      if (!posts || posts.length === 0) return [];
+
+      // Fetch images for all posts
+      const postIds = posts.map((p: any) => p.id);
+      const { data: allImages } = await supabase
+        .from("post_images")
+        .select("*")
+        .in("post_id", postIds)
+        .order("sort_order", { ascending: true });
+
+      const imageMap: Record<string, any[]> = {};
+      (allImages || []).forEach((img: any) => {
+        if (!imageMap[img.post_id]) imageMap[img.post_id] = [];
+        imageMap[img.post_id].push(img);
+      });
 
       // Get like counts and user likes
-      const postIds = (posts || []).map((p) => p.id);
-
       const likeCounts: Record<string, number> = {};
       const userLikes: Record<string, boolean> = {};
       if (postIds.length > 0) {
@@ -75,7 +75,7 @@ export const usePosts = () => {
       }
 
       // Fetch poster profiles via RPC
-      const posterIds = [...new Set((posts || []).map((p) => p.user_id))];
+      const posterIds = [...new Set(posts.map((p: any) => p.user_id))];
       const { data: posterProfiles } = posterIds.length > 0
         ? await supabase.rpc("get_public_profiles", { user_ids: posterIds })
         : { data: [] };
@@ -83,12 +83,7 @@ export const usePosts = () => {
         (posterProfiles || []).map((p: any) => [p.id, p])
       );
 
-      const allPosts = (posts || []).map((p) => {
-        const postLat = p.latitude;
-        const postLng = p.longitude;
-        const dist = (userLat != null && userLng != null && postLat != null && postLng != null)
-          ? Math.round(haversineKm(userLat, userLng, postLat, postLng) * 10) / 10
-          : null;
+      return posts.map((p: any) => {
         const poster = posterMap[p.user_id];
         return {
           id: p.id,
@@ -100,29 +95,14 @@ export const usePosts = () => {
           created_at: p.created_at,
           raffle_due_at: p.raffle_due_at,
           user_id: p.user_id,
-          images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+          images: imageMap[p.id] || [],
           like_count: likeCounts[p.id] || 0,
           user_has_liked: !!userLikes[p.id],
           poster: poster ? { first_name: poster.first_name, last_name: poster.last_name, avatar_url: poster.avatar_url } : null,
-          display_location: (p as any).display_location || null,
-          distance_km: dist,
+          display_location: p.display_location || null,
+          distance_km: p.distance_km ?? null,
         };
       });
-
-      // Filter by 7km radius if user has coordinates
-      if (userLat != null && userLng != null) {
-        return allPosts.filter((post) => {
-          // Show user's own posts regardless of distance
-          if (post.user_id === user?.id) return true;
-          // Posts without coordinates are hidden (legacy data)
-          const postLat = (posts || []).find((pp) => pp.id === post.id)?.latitude;
-          const postLng = (posts || []).find((pp) => pp.id === post.id)?.longitude;
-          if (postLat == null || postLng == null) return true; // Show posts without coords for now
-          return haversineKm(userLat, userLng, postLat, postLng) <= RADIUS_KM;
-        });
-      }
-
-      return allPosts;
     },
   });
 };
@@ -133,16 +113,16 @@ export const usePost = (id: string) => {
   return useQuery({
     queryKey: ["post", id],
     queryFn: async (): Promise<Post | null> => {
-      const { data: p, error } = await supabase
-        .from("posts")
-        .select("*, post_images(*)")
-        .eq("id", id)
-        .single();
+      // Use secure RPC that masks sensitive fields
+      const { data: posts, error } = await supabase.rpc("get_post_detail", { p_post_id: id });
 
       if (error) throw error;
+      const p = posts?.[0];
       if (!p) return null;
 
-      const [{ data: likesInfo }, { data: posterProfiles }] = await Promise.all([
+      // Fetch images, likes, and poster in parallel
+      const [{ data: images }, { data: likesInfo }, { data: posterProfiles }] = await Promise.all([
+        supabase.from("post_images").select("*").eq("post_id", id).order("sort_order", { ascending: true }),
         supabase.rpc("get_post_likes_info", { p_post_ids: [id] }),
         supabase.rpc("get_public_profiles", { user_ids: [p.user_id] }),
       ]);
@@ -162,11 +142,11 @@ export const usePost = (id: string) => {
         created_at: p.created_at,
         raffle_due_at: p.raffle_due_at,
         user_id: p.user_id,
-        images: (p.post_images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
+        images: (images || []).sort((a: any, b: any) => a.sort_order - b.sort_order),
         like_count: likeCount,
         user_has_liked: userLiked,
         poster: poster ? { first_name: poster.first_name, last_name: poster.last_name, avatar_url: poster.avatar_url } : null,
-        display_location: (p as any).display_location || null,
+        display_location: p.display_location || null,
         distance_km: null,
       };
     },
