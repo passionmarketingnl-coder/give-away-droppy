@@ -468,6 +468,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_feed_posts: {
+        Args: { p_radius_km?: number; p_user_lat?: number; p_user_lng?: number }
+        Returns: {
+          category: string
+          created_at: string
+          description: string
+          display_location: string
+          distance_km: number
+          id: string
+          pickup_notes: string
+          raffle_due_at: string
+          raffle_trigger_type: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          winner_user_id: string
+        }[]
+      }
+      get_post_detail: {
+        Args: { p_post_id: string }
+        Returns: {
+          category: string
+          created_at: string
+          description: string
+          display_location: string
+          id: string
+          pickup_notes: string
+          raffle_due_at: string
+          raffle_trigger_type: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          winner_user_id: string
+        }[]
+      }
       get_post_likes_info: {
         Args: { p_post_ids: string[] }
         Returns: {
