@@ -54,6 +54,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       conversations: {
@@ -90,6 +97,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
             referencedColumns: ["id"]
           },
         ]
@@ -165,6 +179,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       post_images: {
@@ -197,6 +218,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "post_images_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       post_likes: {
@@ -227,6 +255,13 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
             referencedColumns: ["id"]
           },
         ]
@@ -381,6 +416,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "raffles_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "raffles_reroll_of_raffle_id_fkey"
             columns: ["reroll_of_raffle_id"]
             isOneToOne: false
@@ -425,6 +467,13 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reports_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts_public"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_consents: {
@@ -465,7 +514,59 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      posts_public: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          display_location: string | null
+          id: string | null
+          raffle_due_at: string | null
+          raffle_trigger_type: string | null
+          status: Database["public"]["Enums"]["post_status"] | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+          winner_user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_location?: string | null
+          id?: string | null
+          raffle_due_at?: string | null
+          raffle_trigger_type?: string | null
+          status?: Database["public"]["Enums"]["post_status"] | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          winner_user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          display_location?: string | null
+          id?: string | null
+          raffle_due_at?: string | null
+          raffle_trigger_type?: string | null
+          status?: Database["public"]["Enums"]["post_status"] | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_user_id_profiles_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_feed_posts: {
