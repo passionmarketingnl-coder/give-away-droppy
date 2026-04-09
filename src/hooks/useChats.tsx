@@ -61,10 +61,10 @@ export const useConversations = () => {
       // Get post titles
       const postIds = [...new Set(convos.map((c) => c.post_id))];
       const { data: posts } = await supabase
-        .from("posts")
+        .from("posts_public" as any)
         .select("id, title")
         .in("id", postIds);
-      const postMap = Object.fromEntries((posts || []).map((p) => [p.id, p.title]));
+      const postMap = Object.fromEntries((posts || []).map((p: any) => [p.id, p.title]));
 
       // Get other user profiles
       const otherUserIds = [...new Set(convos.map((c) =>
