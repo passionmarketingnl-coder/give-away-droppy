@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Users can only subscribe to their own conversation channels" ON public.messages;
