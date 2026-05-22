@@ -22,9 +22,12 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="post/[id]" options={{ headerShown: true, title: 'Post' }} />
+            <Stack.Screen name="chat/[id]" options={{ headerShown: true, title: 'Chat' }} />
+            <Stack.Screen name="profile/edit" options={{ headerShown: true, title: 'Profiel bewerken' }} />
           </Stack>
           <StatusBar style="auto" />
           <PortalHost />

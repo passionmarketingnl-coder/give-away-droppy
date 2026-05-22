@@ -1,33 +1,59 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
+import { Redirect, Tabs } from 'expo-router';
+import { View } from 'react-native';
+import { Bell, Home, MessageCircle, PlusCircle, User } from 'lucide-react-native';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useAuth } from '@/lib/hooks/useAuth';
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <View className="flex-1 bg-background" />;
+  if (!user) return <Redirect href="/auth" />;
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarActiveTintColor: 'hsl(207 90% 54%)',
+        tabBarInactiveTintColor: 'hsl(213 20% 46%)',
+        tabBarStyle: {
+          backgroundColor: 'hsl(0 0% 100%)',
+          borderTopColor: 'hsl(210 15% 87%)',
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Feed',
+          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="chats"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Chats',
+          tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="create"
+        options={{
+          title: 'Geef weg',
+          tabBarIcon: ({ color, size }) => <PlusCircle color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Meldingen',
+          tabBarIcon: ({ color, size }) => <Bell color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profiel',
+          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
     </Tabs>
