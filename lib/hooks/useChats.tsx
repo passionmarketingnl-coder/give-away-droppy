@@ -33,8 +33,12 @@ export const useConversations = () => {
 
   useEffect(() => {
     if (!user) return;
+    // Unieke kanaalnaam per mount voorkomt botsingen wanneer React
+    // (StrictMode dev) of tab-switch een tweede instance mount voordat
+    // de oude removeChannel klaar is.
+    const channelName = `conversations-updates-${user.id}-${Date.now()}`;
     const channel = supabase
-      .channel("conversations-updates")
+      .channel(channelName)
       .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, () => {
         queryClient.invalidateQueries({ queryKey: ["conversations"] });
       })
@@ -119,8 +123,9 @@ export const useMessages = (conversationId: string) => {
 
   useEffect(() => {
     if (!conversationId) return;
+    const channelName = `messages-${conversationId}-${Date.now()}`;
     const channel = supabase
-      .channel(`messages-${conversationId}`)
+      .channel(channelName)
       .on("postgres_changes", {
         event: "INSERT",
         schema: "public",
