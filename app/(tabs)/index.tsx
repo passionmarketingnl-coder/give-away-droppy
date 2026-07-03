@@ -98,6 +98,7 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
+      <View className="max-w-lg mx-auto w-full flex-1">
       <View className="px-4 pt-4 pb-2 bg-background">
         <View className="flex-row gap-2">
           <View className="flex-1 relative">
@@ -200,6 +201,7 @@ export default function FeedScreen() {
           showsVerticalScrollIndicator={false}
         />
       )}
+      </View>
     </View>
   );
 }

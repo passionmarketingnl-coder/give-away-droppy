@@ -114,7 +114,7 @@ export default function CreateScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         className="flex-1"
-        contentContainerClassName="px-4 py-5 gap-6"
+        contentContainerClassName="max-w-lg w-full mx-auto px-4 py-5 gap-6"
         keyboardShouldPersistTaps="handled">
         <Text className="text-2xl font-extrabold text-foreground">Iets weggeven</Text>
 
@@ -221,17 +221,19 @@ export default function CreateScreen() {
       </ScrollView>
 
       <View className="px-4 py-4 bg-background border-t border-border">
-        <Button
-          onPress={handleSubmit}
-          size="lg"
-          className="w-full h-14 rounded-xl"
-          disabled={!canSubmit}>
-          {createPost.isPending ? (
-            <Loader2 size={20} color="white" />
-          ) : (
-            <Text className="font-bold">Publiceer gratis</Text>
-          )}
-        </Button>
+        <View className="max-w-lg mx-auto w-full">
+          <Button
+            onPress={handleSubmit}
+            size="lg"
+            className="w-full h-14 rounded-xl"
+            disabled={!canSubmit}>
+            {createPost.isPending ? (
+              <Loader2 size={20} color="white" />
+            ) : (
+              <Text className="font-bold">Publiceer gratis</Text>
+            )}
+          </Button>
+        </View>
       </View>
 
       {toast && (
