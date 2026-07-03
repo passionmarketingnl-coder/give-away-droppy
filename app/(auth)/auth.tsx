@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { supabase } from '@/lib/supabase/client';
 
-type Step = 'welcome' | 'login' | 'register' | 'verify';
+type Step = 'welcome' | 'login' | 'register' | 'verify' | 'forgot' | 'forgot-sent';
 
 const onboardingHero = require('../../assets/images/onboarding-hero.png');
 
@@ -110,6 +110,30 @@ export default function AuthScreen() {
     setInfoMsg(
       'Google en Apple sign-in komen in een volgende update. Gebruik voor nu e-mail en wachtwoord.'
     );
+  };
+
+  const handleForgotPassword = async () => {
+    clearMessages();
+    if (!email) {
+      setErrorMsg('Vul eerst je e-mailadres in.');
+      return;
+    }
+    setLoading(true);
+    // Op web: redirect naar reset-pagina in dezelfde app.
+    // Op native: dezelfde URL, opent in browser tot deep linking is opgezet.
+    const redirectTo =
+      Platform.OS === 'web' && typeof window !== 'undefined'
+        ? `${window.location.origin}/reset-password`
+        : 'https://droppi.app/reset-password';
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo,
+    });
+    setLoading(false);
+    if (error) {
+      setErrorMsg(`Verzenden mislukt: ${error.message}`);
+      return;
+    }
+    setStep('forgot-sent');
   };
 
   return (
@@ -204,6 +228,16 @@ export default function AuthScreen() {
                   <Text className="font-bold">Inloggen</Text>
                 )}
               </Button>
+              <Pressable
+                onPress={() => {
+                  clearMessages();
+                  setStep('forgot');
+                }}
+                className="mt-3">
+                <Text className="text-sm text-muted-foreground text-center">
+                  Wachtwoord vergeten?
+                </Text>
+              </Pressable>
               <Pressable onPress={() => setStep('register')} className="mt-4">
                 <Text className="text-sm text-primary font-semibold text-center">
                   Nog geen account? Registreer je
@@ -379,6 +413,77 @@ export default function AuthScreen() {
                 variant="outline"
                 className="mt-8 h-12 rounded-xl px-8">
                 <Text>Ga naar inloggen</Text>
+              </Button>
+            </View>
+          )}
+
+          {step === 'forgot' && (
+            <View className="flex-1 px-6 pt-16">
+              <Text className="text-2xl font-extrabold text-foreground mb-2">
+                Wachtwoord vergeten
+              </Text>
+              <Text className="text-muted-foreground mb-8">
+                Vul je e-mailadres in, we sturen je een link om een nieuw wachtwoord
+                in te stellen.
+              </Text>
+              <Input
+                placeholder="E-mailadres"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                className="h-14 rounded-xl"
+              />
+              {errorMsg && (
+                <View className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive">
+                  <Text className="text-sm text-destructive">{errorMsg}</Text>
+                </View>
+              )}
+              <Button
+                onPress={handleForgotPassword}
+                className="w-full mt-6 h-14 rounded-xl"
+                disabled={!email || loading}>
+                {loading ? (
+                  <Loader2 size={20} color="white" />
+                ) : (
+                  <Text className="font-bold">Stuur reset-link</Text>
+                )}
+              </Button>
+              <Pressable
+                onPress={() => {
+                  clearMessages();
+                  setStep('login');
+                }}
+                className="mt-4">
+                <Text className="text-sm text-primary font-semibold text-center">
+                  Terug naar inloggen
+                </Text>
+              </Pressable>
+            </View>
+          )}
+
+          {step === 'forgot-sent' && (
+            <View className="flex-1 items-center justify-center px-6 py-12">
+              <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
+                <Mail size={32} color="hsl(207 90% 54%)" />
+              </View>
+              <Text className="text-2xl font-extrabold text-foreground mb-3">
+                Check je e-mail
+              </Text>
+              <Text className="text-muted-foreground mb-2 max-w-xs text-center">
+                We hebben een reset-link gestuurd naar:
+              </Text>
+              <Text className="font-bold text-foreground mb-6">{email}</Text>
+              <Text className="text-sm text-muted-foreground max-w-xs text-center">
+                Klik op de link in de e-mail om een nieuw wachtwoord in te stellen.
+                Zie je geen mail? Check je spam.
+              </Text>
+              <Button
+                onPress={() => setStep('login')}
+                variant="outline"
+                className="mt-8 h-12 rounded-xl px-8">
+                <Text>Terug naar inloggen</Text>
               </Button>
             </View>
           )}
