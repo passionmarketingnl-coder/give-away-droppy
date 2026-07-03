@@ -212,13 +212,31 @@ export const useCreatePost = () => {
 
       for (let i = 0; i < input.imageFiles.length; i++) {
         const asset = input.imageFiles[i];
-        const name = "name" in asset && asset.name ? asset.name : `${i}.jpg`;
-        const ext = name.split(".").pop();
+        const isFile = typeof File !== "undefined" && asset instanceof File;
+        const uri = isFile ? undefined : (asset as { uri: string }).uri;
+        const name = isFile
+          ? (asset as File).name
+          : (asset as { name?: string }).name || `${i}.jpg`;
+        const mimeType = isFile
+          ? (asset as File).type
+          : (asset as { mimeType?: string; type?: string }).mimeType ||
+            (asset as { type?: string }).type ||
+            "image/jpeg";
+        const ext = name.includes(".") ? name.split(".").pop() : "jpg";
         const path = `${user.id}/${post.id}/${i}.${ext}`;
+
+        // Cross-platform: web geeft File, native geeft {uri}. Beide → arrayBuffer.
+        let body: ArrayBuffer | File;
+        if (isFile) {
+          body = asset as File;
+        } else {
+          const res = await fetch(uri!);
+          body = await res.arrayBuffer();
+        }
 
         const { error: uploadError } = await supabase.storage
           .from("post-images")
-          .upload(path, asset as any);
+          .upload(path, body, { contentType: mimeType, upsert: false });
 
         if (uploadError) throw uploadError;
 
