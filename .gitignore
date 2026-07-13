@@ -40,6 +40,10 @@ expo-env.d.ts
 .env.local
 .env*.local
 
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
