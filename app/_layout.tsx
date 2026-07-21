@@ -3,6 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { PortalHost } from '@rn-primitives/portal';
+import { useFonts as useYanone, YanoneKaffeesatz_500Medium, YanoneKaffeesatz_600SemiBold, YanoneKaffeesatz_700Bold } from '@expo-google-fonts/yanone-kaffeesatz';
+import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 import '../global.css';
 
@@ -39,6 +42,22 @@ function AppShell() {
 }
 
 export default function RootLayout() {
+  const [yanoneLoaded] = useYanone({
+    YanoneKaffeesatz_500Medium,
+    YanoneKaffeesatz_600SemiBold,
+    YanoneKaffeesatz_700Bold,
+  });
+  const [poppinsLoaded] = usePoppins({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+
+  if (!yanoneLoaded || !poppinsLoaded) {
+    return <View className="flex-1 bg-background" />;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

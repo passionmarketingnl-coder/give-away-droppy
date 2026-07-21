@@ -85,7 +85,7 @@ export default function PrivacySheet({ open, onOpenChange }: PrivacySheetProps) 
           </Section>
 
           <Section title="Kinderen">
-            Droppy is niet bestemd voor personen onder de 16 jaar. Vermoed je een
+            Droppi is niet bestemd voor personen onder de 16 jaar. Vermoed je een
             minderjarig account? Mail info@bpecom.nl.
           </Section>
 

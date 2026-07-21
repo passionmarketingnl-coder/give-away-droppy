@@ -60,7 +60,7 @@ export default function PostCard({ post }: PostCardProps) {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `${post.title} — bekijk op Droppy`,
+        message: `${post.title} — bekijk op Droppi`,
         url: `https://droppi.app/post/${post.id}`,
         title: post.title,
       });

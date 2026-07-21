@@ -42,6 +42,16 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Brand palette Huisstijl 2.0
+        droppi: {
+          blue: "hsl(var(--droppi-blue))",
+          pink: "hsl(var(--droppi-pink))",
+          green: "hsl(var(--droppi-green))",
+          navy: "hsl(var(--droppi-navy))",
+          mist: "hsl(var(--droppi-mist))",
+        },
+        // Backwards-compat aliases zodat bestaande StatusBadge / PostCard / etc.
+        // classes blijven werken zonder aanpassen.
         droppy: {
           blue: "hsl(var(--droppy-blue))",
           "blue-dark": "hsl(var(--droppy-blue-dark))",
@@ -60,7 +70,19 @@ module.exports = {
         "2xl": "calc(var(--radius) + 8px)",
       },
       fontFamily: {
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        // Body default (Poppins). Weights beschikbaar via expliciete family
+        // (bijv. font-poppins-600) omdat RN fonts per weight geladen worden.
+        sans: ["Poppins_400Regular", "system-ui", "sans-serif"],
+        // Headings (Yanone Kaffeesatz).
+        heading: ["YanoneKaffeesatz_700Bold", "system-ui", "sans-serif"],
+        // Expliciete weights waar nodig:
+        "poppins-400": ["Poppins_400Regular"],
+        "poppins-500": ["Poppins_500Medium"],
+        "poppins-600": ["Poppins_600SemiBold"],
+        "poppins-700": ["Poppins_700Bold"],
+        "yanone-500": ["YanoneKaffeesatz_500Medium"],
+        "yanone-600": ["YanoneKaffeesatz_600SemiBold"],
+        "yanone-700": ["YanoneKaffeesatz_700Bold"],
       },
     },
   },

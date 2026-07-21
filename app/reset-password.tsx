@@ -97,7 +97,7 @@ export default function ResetPasswordScreen() {
                 Nieuw wachtwoord
               </Text>
               <Text className="text-muted-foreground mb-8">
-                Kies een nieuw wachtwoord voor je Droppy account.
+                Kies een nieuw wachtwoord voor je Droppi account.
               </Text>
               <View className="gap-4">
                 <View className="relative">

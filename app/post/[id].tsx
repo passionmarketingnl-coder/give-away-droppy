@@ -102,7 +102,7 @@ export default function PostDetailScreen() {
     try {
       await Share.share({
         title: post.title,
-        message: `Bekijk "${post.title}" op Droppy!`,
+        message: `Bekijk "${post.title}" op Droppi!`,
         url: `https://droppi.app/post/${post.id}`,
       });
     } catch {

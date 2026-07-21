@@ -35,7 +35,7 @@ export default function TermsSheet({ open, onOpenChange }: TermsSheetProps) {
           <Text className="text-xs text-muted-foreground font-semibold">Versie 1.1</Text>
 
           <Section title="Artikel 1, Definities">
-            Droppy: het platform (app en website) waarop gebruikers gratis producten kunnen
+            Droppi: het platform (app en website) waarop gebruikers gratis producten kunnen
             aanbieden en ontvangen via een lotingssysteem, aangeboden door BP Ecom.
             BP Ecom: eigenaar en exploitant, Het Kaar 7, 5527 GS Hapert, KvK 77270320.
             Gebruiker: iedere natuurlijke persoon die een account aanmaakt.
@@ -46,7 +46,7 @@ export default function TermsSheet({ open, onOpenChange }: TermsSheetProps) {
           </Section>
 
           <Section title="Artikel 2, Toepasselijkheid">
-            Deze Algemene Voorwaarden zijn van toepassing op ieder gebruik van Droppy.
+            Deze Algemene Voorwaarden zijn van toepassing op ieder gebruik van Droppi.
             Door een account aan te maken verklaar je deze voorwaarden te hebben gelezen
             en te aanvaarden. Het aanmaken van een account impliceert dat je aansprakelijk
             kunt worden gesteld voor schade veroorzaakt door handelen in strijd met deze
@@ -54,8 +54,8 @@ export default function TermsSheet({ open, onOpenChange }: TermsSheetProps) {
           </Section>
 
           <Section title="Artikel 3, Het platform">
-            Droppy is een gratis platform voor het lokaal weggeven van producten binnen 7
-            km. Droppy treedt uitsluitend op als technisch tussenpersoon en is geen partij
+            Droppi is een gratis platform voor het lokaal weggeven van producten binnen 7
+            km. Droppi treedt uitsluitend op als technisch tussenpersoon en is geen partij
             in de overdracht van producten. BP Ecom behoudt het recht het platform te
             wijzigen of te beëindigen zonder voorafgaande kennisgeving.
           </Section>
@@ -90,10 +90,10 @@ export default function TermsSheet({ open, onOpenChange }: TermsSheetProps) {
 
           <Section title="Artikel 8, Uitsluiting van aansprakelijkheid">
             BP Ecom is niet aansprakelijk voor enige directe of indirecte schade voortvloeiend
-            uit het gebruik van Droppy, de staat van producten, het niet nakomen van afspraken
-            door gebruikers of technische storingen. Gebruikers maken gebruik van Droppy op
+            uit het gebruik van Droppi, de staat van producten, het niet nakomen van afspraken
+            door gebruikers of technische storingen. Gebruikers maken gebruik van Droppi op
             eigen risico. Maximale aansprakelijkheid van BP Ecom bedraagt €0,00 aangezien
-            Droppy gratis is.
+            Droppi gratis is.
           </Section>
 
           <Section title="Artikel 9, Aansprakelijkheid gebruiker">
@@ -104,7 +104,7 @@ export default function TermsSheet({ open, onOpenChange }: TermsSheetProps) {
           </Section>
 
           <Section title="Artikel 10, Intellectueel eigendom">
-            Alle rechten op naam, logo en content van Droppy berusten bij BP Ecom. Door
+            Alle rechten op naam, logo en content van Droppi berusten bij BP Ecom. Door
             content te plaatsen verleen je BP Ecom een kostenloze licentie voor gebruik op
             het platform.
           </Section>
