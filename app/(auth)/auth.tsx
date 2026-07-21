@@ -9,10 +9,11 @@ import {
 } from 'react-native';
 import {
   ArrowRight,
-  CheckCircle,
+  Check,
   Loader2,
   Mail,
 } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -146,42 +147,61 @@ export default function AuthScreen() {
         <View className="flex-1 max-w-lg w-full mx-auto">
           {step === 'welcome' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <Text className="font-poppins-600 text-sm text-muted-foreground text-center tracking-wider mb-4 uppercase">
+              <Text className="font-poppins-600 text-sm text-muted-foreground text-center tracking-wider mb-6 uppercase">
                 Don't use it? Share it.
               </Text>
               <Image
                 source={logoBlue}
-                className="w-64 h-32 mb-2"
+                className="w-4/5 max-w-sm mb-8"
+                style={{ aspectRatio: 810 / 390 }}
                 resizeMode="contain"
               />
-              <Text className="font-heading text-xl text-droppi-green tracking-widest uppercase mb-6">
-                Care &amp; Share
-              </Text>
-              <Text className="text-base text-muted-foreground text-center mb-2 max-w-xs">
+              <Text className="text-base text-muted-foreground text-center mb-8 max-w-xs">
                 De weggeefhoek voor jouw buurt. Geef gratis weg, eerlijk verloot,
                 makkelijk opgehaald.
               </Text>
-              <View className="gap-3 mt-6 w-full max-w-xs">
-                <View className="flex-row items-center gap-3">
-                  <CheckCircle size={20} color="hsl(207 90% 54%)" />
-                  <Text className="text-sm text-foreground">Plaats iets gratis in je buurt</Text>
-                </View>
-                <View className="flex-row items-center gap-3">
-                  <CheckCircle size={20} color="hsl(207 90% 54%)" />
-                  <Text className="text-sm text-foreground">Buren doen mee met 1 tik</Text>
-                </View>
-                <View className="flex-row items-center gap-3">
-                  <CheckCircle size={20} color="hsl(207 90% 54%)" />
-                  <Text className="text-sm text-foreground">Automatisch eerlijk verloot</Text>
-                </View>
+              <View className="gap-4 w-full max-w-xs items-start">
+                {[
+                  'Plaats iets gratis in je buurt',
+                  'Buren doen mee met 1 tik',
+                  'Automatisch eerlijk verloot',
+                ].map((line) => (
+                  <View key={line} className="flex-row items-center gap-3">
+                    <View className="w-7 h-7 rounded-full bg-droppi-green items-center justify-center">
+                      <Check size={16} color="hsl(238 45% 16%)" strokeWidth={3} />
+                    </View>
+                    <Text className="text-sm text-foreground">{line}</Text>
+                  </View>
+                ))}
               </View>
-              <Button
+              <Pressable
                 onPress={() => setStep('login')}
-                className="w-full max-w-xs mt-10 h-14 rounded-xl"
-                size="lg">
-                <Text className="font-bold">Aan de slag</Text>
-                <ArrowRight size={20} color="white" />
-              </Button>
+                className="w-full max-w-xs mt-10 h-14 rounded-full overflow-hidden"
+                style={Platform.select({
+                  ios: {
+                    shadowColor: '#6880FF',
+                    shadowOpacity: 0.35,
+                    shadowRadius: 18,
+                    shadowOffset: { width: 0, height: 8 },
+                  },
+                  android: { elevation: 8 },
+                  web: { boxShadow: '0 8px 22px rgba(104,128,255,0.35)' } as any,
+                })}>
+                <LinearGradient
+                  colors={['#6880FF', '#9FFA7F']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{
+                    flex: 1,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                  }}>
+                  <Text className="font-poppins-700 text-base text-white">Aan de slag</Text>
+                  <ArrowRight size={20} color="white" />
+                </LinearGradient>
+              </Pressable>
             </View>
           )}
 
