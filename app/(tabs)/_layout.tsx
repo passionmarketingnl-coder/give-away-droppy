@@ -14,11 +14,18 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: 'hsl(207 90% 54%)',
-        tabBarInactiveTintColor: 'hsl(213 20% 46%)',
+        tabBarActiveTintColor: 'hsl(231 100% 71%)',
+        tabBarInactiveTintColor: 'hsl(233 15% 60%)',
+        tabBarLabelStyle: {
+          fontFamily: 'Poppins_600SemiBold',
+          fontSize: 11,
+        },
         tabBarStyle: {
           backgroundColor: 'hsl(0 0% 100%)',
-          borderTopColor: 'hsl(210 15% 87%)',
+          borderTopColor: 'hsl(232 15% 90%)',
+          height: 64,
+          paddingTop: 6,
+          paddingBottom: 8,
         },
       }}>
       <Tabs.Screen

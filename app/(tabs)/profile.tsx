@@ -58,147 +58,152 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-background">
-      <View className="max-w-lg mx-auto w-full">
-        <View className="px-4 pt-6 pb-4">
-          <Text className="text-3xl font-heading text-foreground mb-6">Profiel</Text>
+    <View className="flex-1 bg-background">
+      {/* Brand header full-width met avatar + naam prominent */}
+      <View className="bg-primary pt-4 pb-8">
+        <View className="max-w-lg mx-auto w-full px-4">
+          <Text className="text-3xl font-heading text-white mb-6">Profiel</Text>
 
-          <View className="flex-row items-center gap-4 mb-6">
-            <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center overflow-hidden">
+          <View className="flex-row items-center gap-4">
+            <View className="w-20 h-20 rounded-full bg-white/20 items-center justify-center overflow-hidden">
               {avatarUrl ? (
                 <Image source={{ uri: avatarUrl }} className="w-full h-full" />
               ) : (
-                <Text className="text-primary font-extrabold text-3xl">{initials}</Text>
+                <Text className="text-white font-heading text-3xl">{initials}</Text>
               )}
             </View>
             <View className="flex-1">
-              <Text className="text-xl font-extrabold text-foreground" numberOfLines={1}>
+              <Text className="text-xl font-poppins-700 text-white" numberOfLines={1}>
                 {displayName}
               </Text>
-              <Text className="text-sm text-muted-foreground" numberOfLines={1}>
+              <Text className="text-sm text-white/70" numberOfLines={1}>
                 {user?.email}
               </Text>
-              <View className="flex-row gap-4 mt-1">
-                <Text className="text-xs text-muted-foreground">
-                  <Text className="text-foreground font-bold">{myPosts?.length || 0}</Text>{' '}
+              <View className="flex-row gap-4 mt-1.5">
+                <Text className="text-xs text-white/80">
+                  <Text className="text-white font-poppins-700">{myPosts?.length || 0}</Text>{' '}
                   weggegeven
                 </Text>
-                <Text className="text-xs text-muted-foreground">
-                  <Text className="text-foreground font-bold">{wonPosts?.length || 0}</Text>{' '}
+                <Text className="text-xs text-white/80">
+                  <Text className="text-white font-poppins-700">{wonPosts?.length || 0}</Text>{' '}
                   gewonnen
                 </Text>
               </View>
             </View>
           </View>
         </View>
-
-        <View className="flex-row px-4 gap-2 mb-4">
-          {tabs.map(({ key, label, Icon }) => {
-            const active = tab === key;
-            return (
-              <Pressable
-                key={key}
-                onPress={() => setTab(key)}
-                className={`flex-1 py-2.5 rounded-xl flex-row items-center justify-center gap-1.5 ${
-                  active ? 'bg-primary' : 'bg-card border border-border'
-                }`}>
-                <Icon
-                  size={16}
-                  color={active ? 'white' : 'hsl(213 79% 13%)'}
-                />
-                <Text
-                  className={`text-sm font-bold ${
-                    active ? 'text-primary-foreground' : 'text-foreground'
-                  }`}>
-                  {label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        <View className="px-4 gap-3 pb-4">
-          {loading && (
-            <View className="items-center py-8">
-              <Loader2 size={24} color="hsl(207 90% 54%)" />
-            </View>
-          )}
-          {!loading && (!activePosts || activePosts.length === 0) && (
-            <View className="items-center py-8">
-              <Text className="text-muted-foreground text-sm">
-                {tab === 'given'
-                  ? 'Je hebt nog niets weggegeven.'
-                  : tab === 'won'
-                    ? 'Je hebt nog niets gewonnen.'
-                    : 'Je hebt nog niets geliked.'}
-              </Text>
-            </View>
-          )}
-          {(activePosts || []).map((post: any) => (
-            <Pressable
-              key={post.id}
-              onPress={() => router.push(`/post/${post.id}`)}
-              className="flex-row items-center gap-3 px-3 py-3 bg-card rounded-xl">
-              <View className="w-14 h-14 rounded-lg overflow-hidden bg-muted">
-                {post.images?.[0] ? (
-                  <Image source={{ uri: post.images[0].image_url }} className="w-full h-full" />
-                ) : (
-                  <View className="w-full h-full items-center justify-center">
-                    <Text className="text-muted-foreground text-xs">Geen foto</Text>
-                  </View>
-                )}
-              </View>
-              <View className="flex-1">
-                <Text className="font-bold text-foreground text-sm" numberOfLines={1}>
-                  {post.title}
-                </Text>
-                <Text
-                  className={`text-xs font-semibold ${
-                    post.status === 'active' || post.status === 'ending'
-                      ? 'text-primary'
-                      : 'text-muted-foreground'
-                  }`}>
-                  {statusLabels[post.status] || post.status}
-                </Text>
-              </View>
-              <ChevronRight size={20} color="hsl(213 20% 46%)" />
-            </Pressable>
-          ))}
-        </View>
-
-        <View className="px-4 gap-2 pb-8">
-          <Pressable
-            onPress={() => router.push('/profile/edit')}
-            className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-xl">
-            <Edit3 size={20} color="hsl(213 20% 46%)" />
-            <Text className="flex-1 font-semibold text-foreground">Profiel bewerken</Text>
-            <ChevronRight size={20} color="hsl(213 20% 46%)" />
-          </Pressable>
-          <Pressable
-            onPress={() => signOut()}
-            className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-xl">
-            <LogOut size={20} color="hsl(213 20% 46%)" />
-            <Text className="flex-1 font-semibold text-foreground">Uitloggen</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setTermsOpen(true)}
-            className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-xl">
-            <FileText size={20} color="hsl(213 20% 46%)" />
-            <Text className="flex-1 font-semibold text-foreground">Algemene Voorwaarden</Text>
-            <ChevronRight size={20} color="hsl(213 20% 46%)" />
-          </Pressable>
-          <Pressable
-            onPress={() => setPrivacyOpen(true)}
-            className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-xl">
-            <Shield size={20} color="hsl(213 20% 46%)" />
-            <Text className="flex-1 font-semibold text-foreground">Privacybeleid</Text>
-            <ChevronRight size={20} color="hsl(213 20% 46%)" />
-          </Pressable>
-        </View>
       </View>
+
+      <ScrollView className="flex-1">
+        <View className="max-w-lg mx-auto w-full">
+          <View className="flex-row px-4 gap-2 mt-4 mb-4">
+            {tabs.map(({ key, label, Icon }) => {
+              const active = tab === key;
+              return (
+                <Pressable
+                  key={key}
+                  onPress={() => setTab(key)}
+                  className={`flex-1 py-2.5 rounded-full flex-row items-center justify-center gap-1.5 ${
+                    active ? 'bg-primary' : 'bg-card border border-border'
+                  }`}>
+                  <Icon
+                    size={16}
+                    color={active ? 'white' : 'hsl(238 45% 16%)'}
+                  />
+                  <Text
+                    className={`text-sm font-poppins-600 ${
+                      active ? 'text-white' : 'text-foreground'
+                    }`}>
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View className="px-4 gap-3 pb-4">
+            {loading && (
+              <View className="items-center py-8">
+                <Loader2 size={24} color="hsl(231 100% 71%)" />
+              </View>
+            )}
+            {!loading && (!activePosts || activePosts.length === 0) && (
+              <View className="items-center py-8">
+                <Text className="text-muted-foreground text-sm">
+                  {tab === 'given'
+                    ? 'Je hebt nog niets weggegeven.'
+                    : tab === 'won'
+                      ? 'Je hebt nog niets gewonnen.'
+                      : 'Je hebt nog niets geliked.'}
+                </Text>
+              </View>
+            )}
+            {(activePosts || []).map((post: any) => (
+              <Pressable
+                key={post.id}
+                onPress={() => router.push(`/post/${post.id}`)}
+                className="flex-row items-center gap-3 px-3 py-3 bg-card rounded-2xl">
+                <View className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
+                  {post.images?.[0] ? (
+                    <Image source={{ uri: post.images[0].image_url }} className="w-full h-full" />
+                  ) : (
+                    <View className="w-full h-full items-center justify-center">
+                      <Text className="text-muted-foreground text-xs">Geen foto</Text>
+                    </View>
+                  )}
+                </View>
+                <View className="flex-1">
+                  <Text className="font-poppins-700 text-foreground text-sm" numberOfLines={1}>
+                    {post.title}
+                  </Text>
+                  <Text
+                    className={`text-xs font-poppins-600 ${
+                      post.status === 'active' || post.status === 'ending'
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
+                    }`}>
+                    {statusLabels[post.status] || post.status}
+                  </Text>
+                </View>
+                <ChevronRight size={20} color="hsl(232 15% 55%)" />
+              </Pressable>
+            ))}
+          </View>
+
+          <View className="px-4 gap-2 pb-8">
+            <Pressable
+              onPress={() => router.push('/profile/edit')}
+              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
+              <Edit3 size={20} color="hsl(232 15% 55%)" />
+              <Text className="flex-1 font-poppins-600 text-foreground">Profiel bewerken</Text>
+              <ChevronRight size={20} color="hsl(232 15% 55%)" />
+            </Pressable>
+            <Pressable
+              onPress={() => signOut()}
+              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
+              <LogOut size={20} color="hsl(232 15% 55%)" />
+              <Text className="flex-1 font-poppins-600 text-foreground">Uitloggen</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setTermsOpen(true)}
+              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
+              <FileText size={20} color="hsl(232 15% 55%)" />
+              <Text className="flex-1 font-poppins-600 text-foreground">Algemene Voorwaarden</Text>
+              <ChevronRight size={20} color="hsl(232 15% 55%)" />
+            </Pressable>
+            <Pressable
+              onPress={() => setPrivacyOpen(true)}
+              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
+              <Shield size={20} color="hsl(232 15% 55%)" />
+              <Text className="flex-1 font-poppins-600 text-foreground">Privacybeleid</Text>
+              <ChevronRight size={20} color="hsl(232 15% 55%)" />
+            </Pressable>
+          </View>
+        </View>
+      </ScrollView>
 
       <TermsSheet open={termsOpen} onOpenChange={setTermsOpen} />
       <PrivacySheet open={privacyOpen} onOpenChange={setPrivacyOpen} />
-    </ScrollView>
+    </View>
   );
 }

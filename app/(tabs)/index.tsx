@@ -106,9 +106,9 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="max-w-lg mx-auto w-full flex-1">
-        {/* Brand app-header (Huisstijl 2.0) */}
-        <View className="bg-primary px-4 pt-4 pb-5">
+      {/* Brand app-header — full-width blauw, content gecentreerd */}
+      <View className="bg-primary pt-4 pb-5">
+        <View className="max-w-lg mx-auto w-full px-4">
           <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
             <Image
               source={logoWhite}
@@ -172,7 +172,9 @@ export default function FeedScreen() {
             </DropdownMenu>
           </View>
         </View>
+      </View>
 
+      <View className="max-w-lg mx-auto w-full flex-1">
         {/* Category chips */}
         <ScrollView
           horizontal
