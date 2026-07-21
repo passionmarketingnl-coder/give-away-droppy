@@ -5,10 +5,16 @@ import {
   Platform,
   Pressable,
   RefreshControl,
-  ScrollView,
   TextInput,
   View,
 } from 'react-native';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from 'react-native-reanimated';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { ArrowUpDown, Bell, Clock, Heart, Search, SlidersHorizontal } from 'lucide-react-native';
@@ -29,20 +35,29 @@ import { useUnreadNotificationCount } from '@/lib/hooks/useProfile';
 
 const logoWhite = require('../../assets/brand/logo-white.png');
 
-const categories = [
-  'Alles',
-  'Meubels',
-  'Kinderen',
-  'Keuken',
-  'Elektronica',
-  'Boeken',
-  'Tuin',
-  'Sport',
-  'Kleding',
-  'Overig',
-];
+// Categorie tints: elke categorie z'n eigen brand-tint (uit Huisstijl 2.0
+// "Labels & Categorieën"). Active state → volle brand-kleur.
+const CHIP_TINTS: Record<
+  string,
+  { bg: string; text: string; activeBg: string; activeText: string }
+> = {
+  Alles: { bg: '#F4F4F4', text: '#5A5D78', activeBg: '#16183A', activeText: '#FFF' },
+  Meubels: { bg: '#EEF1FF', text: '#6880FF', activeBg: '#6880FF', activeText: '#FFF' },
+  Kinderen: { bg: '#FDEAFB', text: '#C33BB4', activeBg: '#F65FE7', activeText: '#FFF' },
+  Keuken: { bg: '#EFFDE9', text: '#3F9F52', activeBg: '#9FFA7F', activeText: '#16183A' },
+  Elektronica: { bg: '#EEF1FF', text: '#6880FF', activeBg: '#6880FF', activeText: '#FFF' },
+  Boeken: { bg: '#FDEAFB', text: '#C33BB4', activeBg: '#F65FE7', activeText: '#FFF' },
+  Tuin: { bg: '#EFFDE9', text: '#3F9F52', activeBg: '#9FFA7F', activeText: '#16183A' },
+  Sport: { bg: '#EEF1FF', text: '#6880FF', activeBg: '#6880FF', activeText: '#FFF' },
+  Kleding: { bg: '#FDEAFB', text: '#C33BB4', activeBg: '#F65FE7', activeText: '#FFF' },
+  Overig: { bg: '#F4F4F4', text: '#5A5D78', activeBg: '#16183A', activeText: '#FFF' },
+};
+
+const categories = Object.keys(CHIP_TINTS);
 
 type SortBy = 'newest' | 'ending' | 'popular';
+
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList<PostCardData>);
 
 export default function FeedScreen() {
   const router = useRouter();
@@ -53,6 +68,21 @@ export default function FeedScreen() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [refreshing, setRefreshing] = useState(false);
+
+  // Scroll-collapse: logo+bell rij verdwijnt zodra user naar beneden scrolt.
+  // Search + chips blijven zichtbaar bovenaan.
+  const scrollY = useSharedValue(0);
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+  const logoRowStyle = useAnimatedStyle(() => ({
+    height: interpolate(scrollY.value, [0, 60], [40, 0], Extrapolation.CLAMP),
+    opacity: interpolate(scrollY.value, [0, 40], [1, 0], Extrapolation.CLAMP),
+    marginBottom: interpolate(scrollY.value, [0, 60], [16, 0], Extrapolation.CLAMP),
+    overflow: 'hidden',
+  }));
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -106,10 +136,13 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      {/* Brand app-header — full-width blauw, content gecentreerd */}
-      <View className="bg-primary pt-4 pb-5">
+      {/* Brand app-header — full-width blauw. Logo+bell rij collapse't
+          bij scroll down, search+chips blijven altijd zichtbaar. */}
+      <View className="bg-primary pt-4 pb-4">
         <View className="max-w-lg mx-auto w-full px-4">
-          <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
+          <Animated.View
+            style={logoRowStyle}
+            className="flex-row items-center justify-between">
             <Image
               source={logoWhite}
               style={{ width: 128, height: 32 }}
@@ -127,7 +160,7 @@ export default function FeedScreen() {
                 </View>
               ) : null}
             </Pressable>
-          </View>
+          </Animated.View>
 
           <View className="flex-row gap-2">
             <View className="flex-1 relative">
@@ -174,33 +207,31 @@ export default function FeedScreen() {
         </View>
       </View>
 
-      <View className="max-w-lg mx-auto w-full flex-1">
-        {/* Category chips */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          className="mt-3"
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+      {/* Category chips: multi-line wrap zodat alle categorieën zichtbaar
+          zijn op elk viewport (geen horizontale scroll-cut-off meer). */}
+      <View className="max-w-lg mx-auto w-full px-4 pt-3 pb-1">
+        <View className="flex-row flex-wrap gap-2">
           {categories.map((cat) => {
+            const tint = CHIP_TINTS[cat];
             const active = cat === selectedCategory;
             return (
               <Pressable
                 key={cat}
                 onPress={() => setSelectedCategory(cat)}
-                className={`px-4 h-9 rounded-full items-center justify-center ${
-                  active ? 'bg-primary' : 'bg-white border border-border'
-                }`}>
+                className="px-4 h-9 rounded-full items-center justify-center"
+                style={{ backgroundColor: active ? tint.activeBg : tint.bg }}>
                 <Text
-                  className={`text-sm font-poppins-600 ${
-                    active ? 'text-white' : 'text-foreground'
-                  }`}>
+                  className="text-sm font-poppins-600"
+                  style={{ color: active ? tint.activeText : tint.text }}>
                   {cat}
                 </Text>
               </Pressable>
             );
           })}
-        </ScrollView>
+        </View>
+      </View>
 
+      <View className="max-w-lg mx-auto w-full flex-1">
         {isLoading ? (
           <View className="px-4 gap-4 pt-4">
             {[1, 2, 3].map((i) => (
@@ -217,10 +248,10 @@ export default function FeedScreen() {
             </Text>
           </View>
         ) : (
-          <FlatList
+          <AnimatedFlatList
             data={filtered}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
+            keyExtractor={(item: PostCardData) => item.id}
+            renderItem={({ item }: { item: PostCardData }) => (
               <View className="mb-4">
                 <PostCard post={item} />
               </View>
@@ -234,6 +265,8 @@ export default function FeedScreen() {
               />
             }
             showsVerticalScrollIndicator={false}
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
           />
         )}
       </View>
