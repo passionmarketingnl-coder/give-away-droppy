@@ -22,7 +22,7 @@ import { supabase } from '@/lib/supabase/client';
 
 type Step = 'welcome' | 'login' | 'register' | 'verify' | 'forgot' | 'forgot-sent';
 
-const onboardingHero = require('../../assets/images/onboarding-hero.png');
+const logoBlue = require('../../assets/brand/logo-blue.png');
 
 export default function AuthScreen() {
   const [step, setStep] = useState<Step>('welcome');
@@ -146,18 +146,20 @@ export default function AuthScreen() {
         <View className="flex-1 max-w-lg w-full mx-auto">
           {step === 'welcome' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <View className="w-full max-w-xs mb-8">
-                <Image
-                  source={onboardingHero}
-                  className="w-full h-64 rounded-2xl"
-                  resizeMode="cover"
-                />
-              </View>
-              <Text className="font-heading text-5xl text-foreground text-center mb-3">
-                Welkom bij <Text className="text-primary">Droppi</Text>
+              <Text className="font-poppins-600 text-sm text-muted-foreground text-center tracking-wider mb-4 uppercase">
+                Don't use it? Share it.
+              </Text>
+              <Image
+                source={logoBlue}
+                className="w-64 h-32 mb-2"
+                resizeMode="contain"
+              />
+              <Text className="font-heading text-xl text-droppi-green tracking-widest uppercase mb-6">
+                Care &amp; Share
               </Text>
               <Text className="text-base text-muted-foreground text-center mb-2 max-w-xs">
-                Geef gratis weg aan je buren. Eerlijk verloot, makkelijk opgehaald.
+                De weggeefhoek voor jouw buurt. Geef gratis weg, eerlijk verloot,
+                makkelijk opgehaald.
               </Text>
               <View className="gap-3 mt-6 w-full max-w-xs">
                 <View className="flex-row items-center gap-3">
