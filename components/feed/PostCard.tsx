@@ -73,7 +73,7 @@ export default function PostCard({ post }: PostCardProps) {
     if (!isDummy) router.push(`/post/${post.id}`);
   };
 
-  const isOldEnough = Date.now() - new Date(post.createdAt).getTime() >= 4 * 60 * 60 * 1000;
+  const isOldEnough = Date.now() - new Date(post.createdAt).getTime() >= 8 * 60 * 60 * 1000;
   const likesNeeded = 100 - post.likeCount;
   const showProgress = isOldEnough && likesNeeded > 0 && post.status === 'active';
   const progress = Math.min((post.likeCount / 100) * 100, 100);

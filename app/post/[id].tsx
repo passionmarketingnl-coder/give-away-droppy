@@ -128,7 +128,7 @@ export default function PostDetailScreen() {
     if (conversation) router.push(`/chat/${conversation.id}`);
   };
 
-  const isOldEnough = Date.now() - new Date(post.created_at).getTime() >= 4 * 60 * 60 * 1000;
+  const isOldEnough = Date.now() - new Date(post.created_at).getTime() >= 8 * 60 * 60 * 1000;
   const likesNeeded = 100 - post.like_count;
   const showProgress = isOldEnough && likesNeeded > 0 && post.status === 'active';
   const progress = Math.min((post.like_count / 100) * 100, 100);

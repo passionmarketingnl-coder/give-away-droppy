@@ -17,15 +17,15 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const now = new Date();
-    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
+    const minOnlineAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString();
 
-    // === STEP 1: Check posts with 100+ likes that are at least 4 hours old ===
+    // === STEP 1: Check posts with 100+ likes that are at least 8 hours old ===
     // These get raffled early (before the 24h timer)
     const { data: allActivePosts } = await supabase
       .from("posts")
       .select("id, user_id, title, created_at")
       .in("status", ["active", "ending"])
-      .lte("created_at", fourHoursAgo);
+      .lte("created_at", minOnlineAgo);
 
     for (const post of allActivePosts || []) {
       const { count } = await supabase
@@ -44,13 +44,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // === STEP 2: Raffle all posts where raffle_due_at <= now AND created >= 4h ago ===
+    // === STEP 2: Raffle all posts where raffle_due_at <= now AND created >= 8h ago ===
     const { data: duePosts, error: fetchError } = await supabase
       .from("posts")
       .select("id, user_id, title, created_at")
       .in("status", ["active", "ending"])
       .lte("raffle_due_at", now.toISOString())
-      .lte("created_at", fourHoursAgo);
+      .lte("created_at", minOnlineAgo);
 
     if (fetchError) throw fetchError;
 
