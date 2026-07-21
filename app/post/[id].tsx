@@ -139,49 +139,52 @@ export default function PostDetailScreen() {
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView className="flex-1">
-        {/* Image / gradient hero */}
-        <View className="relative aspect-[4/3]">
-          {images.length > 0 ? (
-            <Image
-              source={{ uri: images[currentImage] }}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          ) : (
-            <LinearGradient
-              colors={['#9FFA7F', '#6880FF']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ flex: 1 }}
-            />
-          )}
-          {/* Gratis pill */}
-          <View className="absolute top-4 left-16 px-3 py-1 rounded-full bg-white">
-            <Text className="text-xs font-poppins-600 text-primary">Gratis</Text>
-          </View>
-          <Pressable
-            onPress={() => router.back()}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
-            <ArrowLeft size={20} color="#16183A" />
-          </Pressable>
-          <Pressable
-            onPress={handleShare}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
-            <Share2 size={20} color="#16183A" />
-          </Pressable>
-          {images.length > 1 && (
-            <View className="absolute bottom-4 left-0 right-0 flex-row justify-center gap-1.5">
-              {images.map((_, i) => (
-                <Pressable
-                  key={i}
-                  onPress={() => setCurrentImage(i)}
-                  className={`h-2 rounded-full ${
-                    i === currentImage ? 'bg-white w-6' : 'bg-white/50 w-2'
-                  }`}
-                />
-              ))}
+        {/* Image / gradient hero — in dezelfde max-w-lg container zodat op
+            desktop de foto niet vol-breedte uitrekt maar in de kolom staat. */}
+        <View className="max-w-lg mx-auto w-full">
+          <View className="relative aspect-[4/3]">
+            {images.length > 0 ? (
+              <Image
+                source={{ uri: images[currentImage] }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            ) : (
+              <LinearGradient
+                colors={['#9FFA7F', '#6880FF']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ flex: 1 }}
+              />
+            )}
+            {/* Gratis pill */}
+            <View className="absolute top-4 left-16 px-3 py-1 rounded-full bg-white">
+              <Text className="text-xs font-poppins-600 text-primary">Gratis</Text>
             </View>
-          )}
+            <Pressable
+              onPress={() => router.back()}
+              className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
+              <ArrowLeft size={20} color="#16183A" />
+            </Pressable>
+            <Pressable
+              onPress={handleShare}
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
+              <Share2 size={20} color="#16183A" />
+            </Pressable>
+            {images.length > 1 && (
+              <View className="absolute bottom-4 left-0 right-0 flex-row justify-center gap-1.5">
+                {images.map((_, i) => (
+                  <Pressable
+                    key={i}
+                    onPress={() => setCurrentImage(i)}
+                    className={`h-2 rounded-full ${
+                      i === currentImage ? 'bg-white w-6' : 'bg-white/50 w-2'
+                    }`}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
         </View>
 
         <View className="max-w-lg mx-auto w-full px-4 py-5 gap-5">
