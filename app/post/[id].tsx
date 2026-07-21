@@ -1,18 +1,19 @@
 import { useState } from 'react';
 import {
   Image,
+  Platform,
   Pressable,
   ScrollView,
   Share,
   View,
 } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import {
   ArrowLeft,
   CheckCircle,
-  ChevronRight,
   Clock,
   Flame,
   Heart,
@@ -65,7 +66,7 @@ export default function PostDetailScreen() {
     return (
       <View className="flex-1 bg-background items-center justify-center">
         <Stack.Screen options={{ headerShown: false }} />
-        <Loader2 size={32} color="hsl(207 90% 54%)" />
+        <Loader2 size={32} color="hsl(231 100% 71%)" />
       </View>
     );
   }
@@ -74,7 +75,7 @@ export default function PostDetailScreen() {
     return (
       <View className="flex-1 bg-background items-center justify-center px-6">
         <Stack.Screen options={{ headerShown: false }} />
-        <Text className="text-lg font-bold text-foreground">Post niet gevonden</Text>
+        <Text className="text-lg font-poppins-700 text-foreground">Post niet gevonden</Text>
         <Button variant="outline" onPress={() => router.replace('/')} className="mt-4">
           <Text>Terug naar feed</Text>
         </Button>
@@ -132,12 +133,14 @@ export default function PostDetailScreen() {
   const likesNeeded = 100 - post.like_count;
   const showProgress = isOldEnough && likesNeeded > 0 && post.status === 'active';
   const progress = Math.min((post.like_count / 100) * 100, 100);
+  const canLike = post.status === 'active' || post.status === 'ending';
 
   return (
     <View className="flex-1 bg-background">
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView className="flex-1">
-        <View className="relative aspect-[4/3] bg-muted">
+        {/* Image / gradient hero */}
+        <View className="relative aspect-[4/3]">
           {images.length > 0 ? (
             <Image
               source={{ uri: images[currentImage] }}
@@ -145,19 +148,26 @@ export default function PostDetailScreen() {
               resizeMode="cover"
             />
           ) : (
-            <View className="w-full h-full items-center justify-center">
-              <Text className="text-muted-foreground">Geen afbeelding</Text>
-            </View>
+            <LinearGradient
+              colors={['#9FFA7F', '#6880FF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ flex: 1 }}
+            />
           )}
+          {/* Gratis pill */}
+          <View className="absolute top-4 left-16 px-3 py-1 rounded-full bg-white">
+            <Text className="text-xs font-poppins-600 text-primary">Gratis</Text>
+          </View>
           <Pressable
             onPress={() => router.back()}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-card/80 items-center justify-center">
-            <ArrowLeft size={20} color="hsl(213 79% 13%)" />
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
+            <ArrowLeft size={20} color="#16183A" />
           </Pressable>
           <Pressable
             onPress={handleShare}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-card/80 items-center justify-center">
-            <Share2 size={20} color="hsl(213 79% 13%)" />
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
+            <Share2 size={20} color="#16183A" />
           </Pressable>
           {images.length > 1 && (
             <View className="absolute bottom-4 left-0 right-0 flex-row justify-center gap-1.5">
@@ -166,7 +176,7 @@ export default function PostDetailScreen() {
                   key={i}
                   onPress={() => setCurrentImage(i)}
                   className={`h-2 rounded-full ${
-                    i === currentImage ? 'bg-card w-6' : 'bg-card/50 w-2'
+                    i === currentImage ? 'bg-white w-6' : 'bg-white/50 w-2'
                   }`}
                 />
               ))}
@@ -174,20 +184,22 @@ export default function PostDetailScreen() {
           )}
         </View>
 
-        <View className="px-4 py-5 gap-5">
+        <View className="max-w-lg mx-auto w-full px-4 py-5 gap-5">
           <View>
             <View className="flex-row items-center gap-2 mb-2">
               <StatusBadge status={post.status as any} />
-              <Text className="text-xs text-muted-foreground font-semibold">
-                {post.category}
-              </Text>
+              <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: '#EEF1FF' }}>
+                <Text className="text-xs font-poppins-600" style={{ color: '#6880FF' }}>
+                  {post.category}
+                </Text>
+              </View>
             </View>
             <Text className="text-3xl font-heading text-foreground">{post.title}</Text>
           </View>
 
           <View className="flex-row items-center gap-4">
             <View className="flex-row items-center gap-1.5">
-              <Clock size={16} color="hsl(213 20% 46%)" />
+              <Clock size={16} color="hsl(232 15% 55%)" />
               <Text className="text-sm text-muted-foreground">
                 {post.raffle_due_at
                   ? formatDistanceToNow(new Date(post.raffle_due_at), {
@@ -198,7 +210,7 @@ export default function PostDetailScreen() {
               </Text>
             </View>
             <View className="flex-row items-center gap-1.5">
-              <Heart size={16} color="hsl(213 20% 46%)" />
+              <Heart size={16} color="hsl(232 15% 55%)" />
               <Text className="text-sm text-muted-foreground">
                 {post.like_count} deelnemers
               </Text>
@@ -206,15 +218,15 @@ export default function PostDetailScreen() {
           </View>
 
           {showProgress && (
-            <View className="gap-2 p-3 rounded-xl bg-primary/5 border border-primary/20">
+            <View className="gap-2 p-4 rounded-2xl bg-primary/5 border border-primary/20">
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center gap-1.5">
-                  <Flame size={16} color="hsl(207 90% 54%)" />
-                  <Text className="text-sm font-bold text-primary">
+                  <Flame size={16} color="#6880FF" />
+                  <Text className="text-sm font-poppins-700 text-primary">
                     Nog {likesNeeded} likes tot de loting!
                   </Text>
                 </View>
-                <Text className="text-sm font-bold text-foreground">
+                <Text className="text-sm font-poppins-700 text-foreground">
                   {post.like_count}/100
                 </Text>
               </View>
@@ -228,30 +240,33 @@ export default function PostDetailScreen() {
           )}
 
           {isRaffled && (
-            <View className="p-4 rounded-xl bg-droppy-gold/10 border border-droppy-gold/30 gap-3">
+            <View className="p-4 rounded-2xl bg-droppi-green/20 border border-droppi-green gap-3">
               <View className="flex-row items-center gap-2">
-                <Trophy size={20} color="hsl(40 85% 55%)" />
-                <Text className="font-bold text-foreground">Loting afgerond!</Text>
+                <Trophy size={20} color="#16183A" />
+                <Text className="font-poppins-700 text-foreground">Loting afgerond!</Text>
               </View>
-              <Text className="text-sm text-muted-foreground">
+              <Text className="text-sm text-foreground/80">
                 {isPoster
                   ? 'Er is een winnaar gekozen. Neem contact op via de chat om de ophaling te regelen.'
                   : 'De loting voor dit item is afgerond. De winnaar is op de hoogte gesteld.'}
               </Text>
               {conversation && (
-                <Button onPress={handleGoToChat} variant="outline" className="w-full rounded-xl">
-                  <MessageCircle size={16} color="hsl(213 79% 13%)" />
-                  <Text>Open chat</Text>
+                <Button
+                  onPress={handleGoToChat}
+                  variant="outline"
+                  className="w-full h-11 rounded-full bg-white">
+                  <MessageCircle size={16} color="#16183A" />
+                  <Text className="font-poppins-600">Open chat</Text>
                 </Button>
               )}
             </View>
           )}
 
           {isPickedUp && (
-            <View className="p-4 rounded-xl bg-primary/5 border border-primary/20">
+            <View className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
               <View className="flex-row items-center gap-2">
-                <CheckCircle size={20} color="hsl(207 90% 54%)" />
-                <Text className="font-bold text-foreground">Opgehaald!</Text>
+                <CheckCircle size={20} color="#6880FF" />
+                <Text className="font-poppins-700 text-foreground">Opgehaald!</Text>
               </View>
               <Text className="text-sm text-muted-foreground mt-1">
                 Dit item is succesvol opgehaald. Bedankt voor het delen!
@@ -264,10 +279,10 @@ export default function PostDetailScreen() {
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
-                    className="w-full h-12 rounded-xl"
+                    className="w-full h-12 rounded-full"
                     disabled={confirmPickup.isPending}>
                     <CheckCircle size={20} color="white" />
-                    <Text className="font-bold">
+                    <Text className="font-poppins-700 text-white">
                       {confirmPickup.isPending ? 'Bezig...' : 'Bevestig ophaling'}
                     </Text>
                   </Button>
@@ -299,10 +314,10 @@ export default function PostDetailScreen() {
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="outline"
-                    className="w-full h-12 rounded-xl border-destructive/30"
+                    className="w-full h-12 rounded-full border-destructive/40"
                     disabled={reroll.isPending}>
                     <RefreshCw size={20} color="hsl(0 72% 51%)" />
-                    <Text className="font-bold text-destructive">
+                    <Text className="font-poppins-700 text-destructive">
                       {reroll.isPending ? 'Bezig...' : 'Herverloting starten'}
                     </Text>
                   </Button>
@@ -334,10 +349,10 @@ export default function PostDetailScreen() {
 
           <View className="flex-row items-center gap-3 py-3 border-y border-border">
             <View className="w-11 h-11 rounded-full bg-primary/10 items-center justify-center">
-              <Text className="text-primary font-bold text-lg">{posterInitial}</Text>
+              <Text className="text-primary font-poppins-700 text-lg">{posterInitial}</Text>
             </View>
             <View className="flex-1">
-              <Text className="font-bold text-foreground">{posterName}</Text>
+              <Text className="font-poppins-700 text-foreground">{posterName}</Text>
               <Text className="text-xs text-muted-foreground">
                 Geplaatst{' '}
                 {formatDistanceToNow(new Date(post.created_at), {
@@ -346,20 +361,19 @@ export default function PostDetailScreen() {
                 })}
               </Text>
             </View>
-            <ChevronRight size={20} color="hsl(213 20% 46%)" />
           </View>
 
           <View>
-            <Text className="font-bold text-foreground mb-2">Beschrijving</Text>
-            <Text className="text-sm text-muted-foreground leading-relaxed">
+            <Text className="font-heading text-2xl text-foreground mb-2">Beschrijving</Text>
+            <Text className="text-sm text-foreground/80 leading-relaxed">
               {post.description}
             </Text>
           </View>
 
           {post.pickup_notes && (
             <View>
-              <Text className="font-bold text-foreground mb-2">Ophaalvoorkeur</Text>
-              <Text className="text-sm text-muted-foreground leading-relaxed">
+              <Text className="font-heading text-2xl text-foreground mb-2">Ophaalvoorkeur</Text>
+              <Text className="text-sm text-foreground/80 leading-relaxed">
                 {post.pickup_notes}
               </Text>
             </View>
@@ -370,36 +384,63 @@ export default function PostDetailScreen() {
         </View>
       </ScrollView>
 
-      {(post.status === 'active' || post.status === 'ending') && (
+      {canLike && (
         <View className="px-4 py-4 bg-background border-t border-border">
-          <Button
-            onPress={handleLike}
-            size="lg"
-            className={`w-full h-14 rounded-xl ${
-              post.user_has_liked ? 'bg-accent' : ''
-            }`}>
-            <Heart
-              size={20}
-              color="white"
-              fill={post.user_has_liked ? 'white' : 'transparent'}
-            />
-            <Text className="font-bold">
-              {post.user_has_liked ? 'Je doet mee! 🎉' : 'Doe mee aan de loting'}
-            </Text>
-          </Button>
+          <View className="max-w-lg mx-auto w-full">
+            <Pressable
+              onPress={handleLike}
+              className="w-full h-14 rounded-full overflow-hidden"
+              style={Platform.select({
+                ios: {
+                  shadowColor: post.user_has_liked ? '#F65FE7' : '#6880FF',
+                  shadowOpacity: 0.35,
+                  shadowRadius: 18,
+                  shadowOffset: { width: 0, height: 8 },
+                },
+                android: { elevation: 8 },
+                web: {
+                  boxShadow: post.user_has_liked
+                    ? '0 8px 22px rgba(246,95,231,0.35)'
+                    : '0 8px 22px rgba(104,128,255,0.35)',
+                } as any,
+              })}>
+              <LinearGradient
+                colors={
+                  post.user_has_liked ? ['#F65FE7', '#6880FF'] : ['#6880FF', '#9FFA7F']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}>
+                <Heart
+                  size={20}
+                  color="white"
+                  fill={post.user_has_liked ? 'white' : 'transparent'}
+                />
+                <Text className="font-poppins-700 text-base text-white">
+                  {post.user_has_liked ? 'Je doet mee! 🎉' : 'Doe mee aan de loting'}
+                </Text>
+              </LinearGradient>
+            </Pressable>
+          </View>
         </View>
       )}
 
       {toast && (
         <View
-          className={`absolute top-16 left-4 right-4 p-3 rounded-xl ${
+          className={`absolute top-16 left-4 right-4 p-3 rounded-2xl ${
             toast.kind === 'success'
-              ? 'bg-droppy-success/10 border border-droppy-success'
+              ? 'bg-droppi-green/20 border border-droppi-green'
               : 'bg-destructive/10 border border-destructive'
           }`}>
           <Text
             className={`text-sm ${
-              toast.kind === 'success' ? 'text-droppy-success' : 'text-destructive'
+              toast.kind === 'success' ? 'text-foreground' : 'text-destructive'
             }`}>
             {toast.msg}
           </Text>

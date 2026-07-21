@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Camera, Loader2, Plus, X } from 'lucide-react-native';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Textarea } from '@/components/ui/textarea';
@@ -112,20 +112,28 @@ export default function CreateScreen() {
     <KeyboardAvoidingView
       className="flex-1 bg-background"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {/* Brand app-header (full-width) */}
+      <View className="bg-primary pt-4 pb-5">
+        <View className="max-w-lg mx-auto w-full px-4">
+          <Text className="text-3xl font-heading text-white">Iets weggeven</Text>
+          <Text className="text-sm text-white/80 mt-1">
+            Droppen is delen, maak een buurtgenoot blij.
+          </Text>
+        </View>
+      </View>
+
       <ScrollView
         className="flex-1"
         contentContainerClassName="max-w-lg w-full mx-auto px-4 py-5 gap-6"
         keyboardShouldPersistTaps="handled">
-        <Text className="text-2xl font-extrabold text-foreground">Iets weggeven</Text>
-
         <View>
-          <Text className="text-sm font-bold text-foreground mb-3">
-            Foto&apos;s <Text className="text-muted-foreground font-normal">(max 5)</Text>
+          <Text className="text-sm font-poppins-700 text-foreground mb-3">
+            Foto&apos;s <Text className="text-muted-foreground font-poppins-400">(max 5)</Text>
           </Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View className="flex-row gap-3">
               {images.map((img, i) => (
-                <View key={i} className="w-24 h-24 rounded-xl overflow-hidden">
+                <View key={i} className="w-24 h-24 rounded-2xl overflow-hidden">
                   <Image source={{ uri: img.uri }} className="w-full h-full" />
                   <Pressable
                     onPress={() => removeImage(i)}
@@ -137,16 +145,16 @@ export default function CreateScreen() {
               {images.length < 5 && (
                 <Pressable
                   onPress={pickImages}
-                  className="w-24 h-24 rounded-xl border-2 border-dashed border-border items-center justify-center gap-1">
+                  className="w-24 h-24 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 items-center justify-center gap-1">
                   {images.length === 0 ? (
                     <>
-                      <Camera size={24} color="hsl(213 20% 46%)" />
-                      <Text className="text-xs text-muted-foreground font-semibold">
+                      <Camera size={22} color="hsl(231 100% 71%)" />
+                      <Text className="text-xs text-primary font-poppins-600">
                         Voeg toe
                       </Text>
                     </>
                   ) : (
-                    <Plus size={24} color="hsl(213 20% 46%)" />
+                    <Plus size={24} color="hsl(231 100% 71%)" />
                   )}
                 </Pressable>
               )}
@@ -155,27 +163,27 @@ export default function CreateScreen() {
         </View>
 
         <View>
-          <Text className="text-sm font-bold text-foreground mb-2">Titel</Text>
+          <Text className="text-sm font-poppins-700 text-foreground mb-2">Titel</Text>
           <Input
             placeholder="Bijv. IKEA Kallax kast"
             value={title}
             onChangeText={setTitle}
-            className="h-12 rounded-xl"
+            className="h-12 rounded-full px-5"
           />
         </View>
 
         <View>
-          <Text className="text-sm font-bold text-foreground mb-2">Beschrijving</Text>
+          <Text className="text-sm font-poppins-700 text-foreground mb-2">Beschrijving</Text>
           <Textarea
             placeholder="Vertel iets over het product, de staat en eventuele gebreken..."
             value={description}
             onChangeText={setDescription}
-            className="min-h-[100px] rounded-xl"
+            className="min-h-[100px] rounded-2xl px-4 py-3"
           />
         </View>
 
         <View>
-          <Text className="text-sm font-bold text-foreground mb-3">Categorie</Text>
+          <Text className="text-sm font-poppins-700 text-foreground mb-3">Categorie</Text>
           <View className="flex-row flex-wrap gap-2">
             {categories.map((cat) => {
               const active = category === cat;
@@ -183,12 +191,12 @@ export default function CreateScreen() {
                 <Pressable
                   key={cat}
                   onPress={() => setCategory(cat)}
-                  className={`px-4 py-2.5 rounded-xl ${
-                    active ? 'bg-primary' : 'bg-card border border-border'
+                  className={`px-4 h-10 rounded-full items-center justify-center ${
+                    active ? 'bg-primary' : 'bg-white border border-border'
                   }`}>
                   <Text
-                    className={`text-sm font-semibold ${
-                      active ? 'text-primary-foreground' : 'text-foreground'
+                    className={`text-sm font-poppins-600 ${
+                      active ? 'text-white' : 'text-foreground'
                     }`}>
                     {cat}
                   </Text>
@@ -199,21 +207,22 @@ export default function CreateScreen() {
         </View>
 
         <View>
-          <Text className="text-sm font-bold text-foreground mb-2">
+          <Text className="text-sm font-poppins-700 text-foreground mb-2">
             Ophaalvoorkeur{' '}
-            <Text className="text-muted-foreground font-normal">(optioneel)</Text>
+            <Text className="text-muted-foreground font-poppins-400">(optioneel)</Text>
           </Text>
           <Input
             placeholder="Bijv. voordeur begane grond, na 17:00"
             value={pickupNotes}
             onChangeText={setPickupNotes}
-            className="h-12 rounded-xl"
+            className="h-12 rounded-full px-5"
           />
         </View>
 
-        <View className="p-4 rounded-xl bg-primary/5">
+        <View className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
           <Text className="text-sm text-foreground leading-relaxed">
-            📍 Je product wordt zichtbaar voor buren binnen <Text className="font-bold">7 km</Text>.
+            📍 Je product wordt zichtbaar voor buren binnen{' '}
+            <Text className="font-poppins-700">7 km</Text>.
             {'\n'}
             ⏱️ Na 24 uur of bij 100 likes wordt automatisch een winnaar geloot.
           </Text>
@@ -222,30 +231,57 @@ export default function CreateScreen() {
 
       <View className="px-4 py-4 bg-background border-t border-border">
         <View className="max-w-lg mx-auto w-full">
-          <Button
+          <Pressable
             onPress={handleSubmit}
-            size="lg"
-            className="w-full h-14 rounded-xl"
-            disabled={!canSubmit}>
-            {createPost.isPending ? (
-              <Loader2 size={20} color="white" />
-            ) : (
-              <Text className="font-bold">Publiceer gratis</Text>
-            )}
-          </Button>
+            disabled={!canSubmit}
+            className={`w-full h-14 rounded-full overflow-hidden ${
+              !canSubmit ? 'opacity-50' : ''
+            }`}
+            style={
+              canSubmit
+                ? Platform.select({
+                    ios: {
+                      shadowColor: '#6880FF',
+                      shadowOpacity: 0.35,
+                      shadowRadius: 18,
+                      shadowOffset: { width: 0, height: 8 },
+                    },
+                    android: { elevation: 8 },
+                    web: { boxShadow: '0 8px 22px rgba(104,128,255,0.35)' } as any,
+                  })
+                : undefined
+            }>
+            <LinearGradient
+              colors={['#6880FF', '#9FFA7F']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                gap: 8,
+              }}>
+              {createPost.isPending ? (
+                <Loader2 size={20} color="white" />
+              ) : (
+                <Text className="font-poppins-700 text-base text-white">Publiceer gratis</Text>
+              )}
+            </LinearGradient>
+          </Pressable>
         </View>
       </View>
 
       {toast && (
         <View
-          className={`absolute top-16 left-4 right-4 p-3 rounded-xl ${
+          className={`absolute top-16 left-4 right-4 p-3 rounded-2xl ${
             toast.kind === 'success'
-              ? 'bg-droppy-success/10 border border-droppy-success'
+              ? 'bg-droppi-green/20 border border-droppi-green'
               : 'bg-destructive/10 border border-destructive'
           }`}>
           <Text
             className={`text-sm ${
-              toast.kind === 'success' ? 'text-droppy-success' : 'text-destructive'
+              toast.kind === 'success' ? 'text-foreground' : 'text-destructive'
             }`}>
             {toast.msg}
           </Text>
