@@ -48,7 +48,10 @@ async function getExpoPushToken(): Promise<string | null> {
 async function registerToken(userId: string, token: string) {
   const platform = Platform.OS;
   // Upsert: één rij per unieke token, koppel aan huidige user.
-  await supabase
+  // user_push_tokens staat wel in de DB maar nog niet in de gegenereerde
+  // types.ts (regen via `supabase gen types typescript` later). Cast naar
+  // any om TS te laten passen; runtime werkt correct.
+  await (supabase as any)
     .from('user_push_tokens')
     .upsert(
       { user_id: userId, token, platform, updated_at: new Date().toISOString() },

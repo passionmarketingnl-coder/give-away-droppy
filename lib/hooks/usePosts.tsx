@@ -45,8 +45,8 @@ export const usePosts = () => {
       }
 
       const { data: posts, error } = await supabase.rpc("get_feed_posts", {
-        p_user_lat: userLat,
-        p_user_lng: userLng,
+        p_user_lat: userLat ?? undefined,
+        p_user_lng: userLng ?? undefined,
         p_radius_km: 7,
       });
 

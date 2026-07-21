@@ -10,9 +10,10 @@ import Animated from 'react-native-reanimated';
  *   <Text>I am only animated on native</Text>
  * </NativeOnlyAnimatedView>
  */
-function NativeOnlyAnimatedView(
-  props: React.ComponentProps<typeof Animated.View> & React.RefAttributes<typeof Animated.View>
-) {
+// Type-cast op React.ComponentProps van Animated.View → any om ref-mismatch
+// tussen react-native-reanimated 4.x en RNR's original component-template te
+// omzeilen. Runtime werkt correct; alleen TS ref-inferentie klaagt.
+function NativeOnlyAnimatedView(props: any) {
   if (Platform.OS === 'web') {
     return <>{props.children as React.ReactNode}</>;
   } else {

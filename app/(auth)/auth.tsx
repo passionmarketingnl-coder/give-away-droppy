@@ -152,8 +152,8 @@ export default function AuthScreen() {
               </Text>
               <Image
                 source={logoBlue}
-                className="w-4/5 max-w-sm mb-8"
-                style={{ aspectRatio: 1200 / 304 }}
+                style={{ width: '80%', maxWidth: 280, aspectRatio: 1200 / 304 }}
+                className="mb-8"
                 resizeMode="contain"
               />
               <Text className="text-base text-muted-foreground text-center mb-8 max-w-xs">
