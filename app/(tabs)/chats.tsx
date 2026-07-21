@@ -21,7 +21,7 @@ export default function ChatsScreen() {
     <View className="flex-1 bg-background">
       <View className="max-w-lg mx-auto w-full flex-1">
         <View className="px-4 pt-4 pb-3">
-          <Text className="text-2xl font-extrabold text-foreground">Berichten</Text>
+          <Text className="text-3xl font-heading text-foreground">Berichten</Text>
         </View>
 
         {isLoading ? (

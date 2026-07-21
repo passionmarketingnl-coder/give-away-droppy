@@ -61,7 +61,7 @@ export default function ProfileScreen() {
     <ScrollView className="flex-1 bg-background">
       <View className="max-w-lg mx-auto w-full">
         <View className="px-4 pt-6 pb-4">
-          <Text className="text-2xl font-extrabold text-foreground mb-6">Profiel</Text>
+          <Text className="text-3xl font-heading text-foreground mb-6">Profiel</Text>
 
           <View className="flex-row items-center gap-4 mb-6">
             <View className="w-20 h-20 rounded-full bg-primary/10 items-center justify-center overflow-hidden">

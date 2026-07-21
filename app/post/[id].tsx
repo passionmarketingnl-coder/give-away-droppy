@@ -182,7 +182,7 @@ export default function PostDetailScreen() {
                 {post.category}
               </Text>
             </View>
-            <Text className="text-2xl font-extrabold text-foreground">{post.title}</Text>
+            <Text className="text-3xl font-heading text-foreground">{post.title}</Text>
           </View>
 
           <View className="flex-row items-center gap-4">

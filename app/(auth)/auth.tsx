@@ -185,7 +185,7 @@ export default function AuthScreen() {
 
           {step === 'login' && (
             <View className="flex-1 px-6 pt-16">
-              <Text className="text-2xl font-extrabold text-foreground mb-2">Inloggen</Text>
+              <Text className="text-3xl font-heading text-foreground mb-2">Inloggen</Text>
               <Text className="text-muted-foreground mb-8">
                 Log in met je e-mail en wachtwoord.
               </Text>
@@ -270,7 +270,7 @@ export default function AuthScreen() {
 
           {step === 'register' && (
             <View className="flex-1 px-6 pt-16 pb-8">
-              <Text className="text-2xl font-extrabold text-foreground mb-2">
+              <Text className="text-3xl font-heading text-foreground mb-2">
                 Account aanmaken
               </Text>
               <Text className="text-muted-foreground mb-8">
@@ -397,7 +397,7 @@ export default function AuthScreen() {
               <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
                 <Mail size={32} color="hsl(207 90% 54%)" />
               </View>
-              <Text className="text-2xl font-extrabold text-foreground mb-3">
+              <Text className="text-3xl font-heading text-foreground mb-3">
                 Bevestig je e-mail
               </Text>
               <Text className="text-muted-foreground mb-2 max-w-xs text-center">
@@ -419,7 +419,7 @@ export default function AuthScreen() {
 
           {step === 'forgot' && (
             <View className="flex-1 px-6 pt-16">
-              <Text className="text-2xl font-extrabold text-foreground mb-2">
+              <Text className="text-3xl font-heading text-foreground mb-2">
                 Wachtwoord vergeten
               </Text>
               <Text className="text-muted-foreground mb-8">
@@ -468,7 +468,7 @@ export default function AuthScreen() {
               <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
                 <Mail size={32} color="hsl(207 90% 54%)" />
               </View>
-              <Text className="text-2xl font-extrabold text-foreground mb-3">
+              <Text className="text-3xl font-heading text-foreground mb-3">
                 Check je e-mail
               </Text>
               <Text className="text-muted-foreground mb-2 max-w-xs text-center">
