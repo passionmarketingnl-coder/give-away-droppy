@@ -10,9 +10,9 @@ import {
 import { Stack, useRouter } from 'expo-router';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as ImagePicker from 'expo-image-picker';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Camera, Home, Loader2, MapPin } from 'lucide-react-native';
 
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -153,12 +153,13 @@ export default function EditProfileScreen() {
     return (
       <View className="flex-1 bg-background items-center justify-center">
         <Stack.Screen options={{ headerShown: false }} />
-        <Loader2 size={32} color="hsl(207 90% 54%)" />
+        <Loader2 size={32} color="hsl(231 100% 71%)" />
       </View>
     );
   }
 
   const initials = firstName ? `${firstName.charAt(0)}${lastName.charAt(0)}` : '?';
+  const canSave = firstName && lastName && !saveMutation.isPending;
 
   return (
     <KeyboardAvoidingView
@@ -166,11 +167,16 @@ export default function EditProfileScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View className="px-4 py-3 flex-row items-center gap-3 border-b border-border bg-background">
-        <Pressable onPress={() => router.back()}>
-          <ArrowLeft size={24} color="hsl(213 79% 13%)" />
-        </Pressable>
-        <Text className="text-lg font-extrabold text-foreground">Profiel bewerken</Text>
+      {/* Brand app-header (full-width) */}
+      <View className="bg-primary pt-4 pb-5">
+        <View className="max-w-lg mx-auto w-full px-4 flex-row items-center gap-3">
+          <Pressable
+            onPress={() => router.back()}
+            className="w-10 h-10 rounded-full bg-white/20 items-center justify-center">
+            <ArrowLeft size={20} color="#ffffff" />
+          </Pressable>
+          <Text className="text-2xl font-heading text-white">Profiel bewerken</Text>
+        </View>
       </View>
 
       <ScrollView
@@ -185,89 +191,117 @@ export default function EditProfileScreen() {
               {avatarPreview ? (
                 <Image source={{ uri: avatarPreview }} className="w-full h-full" />
               ) : (
-                <Text className="text-primary font-extrabold text-3xl">{initials}</Text>
+                <Text className="text-primary font-heading text-3xl">{initials}</Text>
               )}
               <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary items-center justify-center">
                 <Camera size={16} color="white" />
               </View>
             </Pressable>
             <Pressable onPress={pickAvatar}>
-              <Text className="text-sm text-primary font-semibold">Foto wijzigen</Text>
+              <Text className="text-sm text-primary font-poppins-600">Foto wijzigen</Text>
             </Pressable>
           </View>
 
           <View className="gap-4">
             <View>
-              <Text className="text-sm font-bold text-foreground mb-1.5">Voornaam</Text>
+              <Text className="text-sm font-poppins-700 text-foreground mb-1.5">Voornaam</Text>
               <Input
                 value={firstName}
                 onChangeText={setFirstName}
-                className="h-14 rounded-xl"
+                className="h-12 rounded-full px-5"
               />
             </View>
             <View>
-              <Text className="text-sm font-bold text-foreground mb-1.5">Achternaam</Text>
+              <Text className="text-sm font-poppins-700 text-foreground mb-1.5">Achternaam</Text>
               <Input
                 value={lastName}
                 onChangeText={setLastName}
-                className="h-14 rounded-xl"
+                className="h-12 rounded-full px-5"
               />
             </View>
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Text className="text-sm font-bold text-foreground mb-1.5">Postcode</Text>
+                <Text className="text-sm font-poppins-700 text-foreground mb-1.5">Postcode</Text>
                 <View className="relative">
                   <View className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                    <MapPin size={20} color="hsl(213 20% 46%)" />
+                    <MapPin size={18} color="hsl(232 15% 55%)" />
                   </View>
                   <Input
                     value={postcode}
                     onChangeText={setPostcode}
                     autoCapitalize="characters"
                     maxLength={7}
-                    className="pl-12 h-14 rounded-xl"
+                    className="pl-11 h-12 rounded-full"
                   />
                 </View>
               </View>
               <View className="w-28">
-                <Text className="text-sm font-bold text-foreground mb-1.5">Huisnr.</Text>
+                <Text className="text-sm font-poppins-700 text-foreground mb-1.5">Huisnr.</Text>
                 <View className="relative">
                   <View className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
-                    <Home size={20} color="hsl(213 20% 46%)" />
+                    <Home size={18} color="hsl(232 15% 55%)" />
                   </View>
                   <Input
                     value={houseNumber}
                     onChangeText={setHouseNumber}
-                    className="pl-12 h-14 rounded-xl"
+                    className="pl-11 h-12 rounded-full"
                   />
                 </View>
               </View>
             </View>
           </View>
 
-          <Button
+          <Pressable
             onPress={() => saveMutation.mutate()}
-            className="w-full h-14 rounded-xl"
-            disabled={!firstName || !lastName || saveMutation.isPending}>
-            {saveMutation.isPending ? (
-              <Loader2 size={20} color="white" />
-            ) : (
-              <Text className="font-bold">Opslaan</Text>
-            )}
-          </Button>
+            disabled={!canSave}
+            className={`w-full h-14 rounded-full overflow-hidden ${
+              !canSave ? 'opacity-50' : ''
+            }`}
+            style={
+              canSave
+                ? Platform.select({
+                    ios: {
+                      shadowColor: '#6880FF',
+                      shadowOpacity: 0.35,
+                      shadowRadius: 18,
+                      shadowOffset: { width: 0, height: 8 },
+                    },
+                    android: { elevation: 8 },
+                    web: { boxShadow: '0 8px 22px rgba(104,128,255,0.35)' } as any,
+                  })
+                : undefined
+            }>
+            <LinearGradient
+              colors={['#6880FF', '#9FFA7F']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                gap: 8,
+              }}>
+              {saveMutation.isPending ? (
+                <Loader2 size={20} color="white" />
+              ) : (
+                <Text className="font-poppins-700 text-base text-white">Opslaan</Text>
+              )}
+            </LinearGradient>
+          </Pressable>
         </View>
       </ScrollView>
 
       {toast && (
         <View
-          className={`absolute top-16 left-4 right-4 p-3 rounded-xl ${
+          className={`absolute top-16 left-4 right-4 p-3 rounded-2xl ${
             toast.kind === 'success'
-              ? 'bg-droppy-success/10 border border-droppy-success'
+              ? 'bg-droppi-green/20 border border-droppi-green'
               : 'bg-destructive/10 border border-destructive'
           }`}>
           <Text
             className={`text-sm ${
-              toast.kind === 'success' ? 'text-droppy-success' : 'text-destructive'
+              toast.kind === 'success' ? 'text-foreground' : 'text-destructive'
             }`}>
             {toast.msg}
           </Text>
