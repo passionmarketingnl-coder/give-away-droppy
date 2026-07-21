@@ -1,6 +1,6 @@
 import { Redirect, Tabs } from 'expo-router';
-import { View } from 'react-native';
-import { Bell, Home, MessageCircle, PlusCircle, User } from 'lucide-react-native';
+import { Platform, Pressable, View } from 'react-native';
+import { Bell, Home, MessageCircle, Plus, User } from 'lucide-react-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 
@@ -45,8 +45,28 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="create"
         options={{
-          title: 'Geef weg',
-          tabBarIcon: ({ color, size }) => <PlusCircle color={color} size={size} />,
+          title: '',
+          tabBarButton: (props) => (
+            <Pressable
+              onPress={props.onPress as any}
+              className="flex-1 items-center justify-center"
+              style={{ marginTop: -18 }}>
+              <View
+                className="w-14 h-14 rounded-full bg-droppi-pink items-center justify-center"
+                style={Platform.select({
+                  ios: {
+                    shadowColor: '#F65FE7',
+                    shadowOpacity: 0.45,
+                    shadowRadius: 14,
+                    shadowOffset: { width: 0, height: 8 },
+                  },
+                  android: { elevation: 10 },
+                  web: { boxShadow: '0 10px 22px rgba(246,95,231,0.45)' } as any,
+                })}>
+                <Plus size={28} color="#ffffff" strokeWidth={3} />
+              </View>
+            </Pressable>
+          ),
         }}
       />
       <Tabs.Screen

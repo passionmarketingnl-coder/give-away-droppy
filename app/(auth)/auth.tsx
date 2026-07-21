@@ -219,7 +219,7 @@ export default function AuthScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
                 <Input
                   placeholder="Wachtwoord"
@@ -227,22 +227,22 @@ export default function AuthScreen() {
                   onChangeText={setPassword}
                   secureTextEntry
                   autoComplete="current-password"
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
               </View>
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive">
+                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
                   <Text className="text-sm text-destructive">{errorMsg}</Text>
                 </View>
               )}
               {infoMsg && (
-                <View className="mt-4 p-3 rounded-xl bg-primary/10 border border-primary">
+                <View className="mt-4 p-3 rounded-full bg-primary/10 border border-primary">
                   <Text className="text-sm text-foreground">{infoMsg}</Text>
                 </View>
               )}
               <Button
                 onPress={handleLogin}
-                className="w-full mt-6 h-14 rounded-xl"
+                className="w-full mt-6 h-14 rounded-full"
                 disabled={!email || !password || loading}>
                 {loading ? (
                   <Loader2 size={20} color="white" />
@@ -274,13 +274,13 @@ export default function AuthScreen() {
                 <Button
                   variant="outline"
                   onPress={showOAuthSoon}
-                  className="flex-1 h-14 rounded-xl">
+                  className="flex-1 h-14 rounded-full">
                   <Text>Google</Text>
                 </Button>
                 <Button
                   variant="outline"
                   onPress={showOAuthSoon}
-                  className="flex-1 h-14 rounded-xl">
+                  className="flex-1 h-14 rounded-full">
                   <Text>Apple</Text>
                 </Button>
               </View>
@@ -303,13 +303,13 @@ export default function AuthScreen() {
                   placeholder="Voornaam"
                   value={firstName}
                   onChangeText={setFirstName}
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
                 <Input
                   placeholder="Achternaam"
                   value={lastName}
                   onChangeText={setLastName}
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
                 <Input
                   placeholder="Telefoonnummer"
@@ -317,7 +317,7 @@ export default function AuthScreen() {
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
                   autoComplete="tel"
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
                 <View className="flex-row gap-3">
                   <Input
@@ -326,13 +326,13 @@ export default function AuthScreen() {
                     onChangeText={setPostcode}
                     autoCapitalize="characters"
                     maxLength={7}
-                    className="flex-1 h-14 rounded-xl"
+                    className="flex-1 h-14 rounded-full"
                   />
                   <Input
                     placeholder="Nr."
                     value={houseNumber}
                     onChangeText={setHouseNumber}
-                    className="w-28 h-14 rounded-xl"
+                    className="w-28 h-14 rounded-full"
                   />
                 </View>
                 <Input
@@ -342,7 +342,7 @@ export default function AuthScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
                 <Input
                   placeholder="Wachtwoord (min. 6 tekens)"
@@ -350,7 +350,7 @@ export default function AuthScreen() {
                   onChangeText={setPassword}
                   secureTextEntry
                   autoComplete="new-password"
-                  className="h-14 rounded-xl"
+                  className="h-14 rounded-full"
                 />
               </View>
               <View className="gap-3 mt-4">
@@ -381,13 +381,13 @@ export default function AuthScreen() {
                 </View>
               </View>
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive">
+                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
                   <Text className="text-sm text-destructive">{errorMsg}</Text>
                 </View>
               )}
               <Button
                 onPress={handleRegister}
-                className="w-full mt-6 h-14 rounded-xl"
+                className="w-full mt-6 h-14 rounded-full"
                 disabled={
                   !email ||
                   !password ||
@@ -433,7 +433,7 @@ export default function AuthScreen() {
               <Button
                 onPress={() => setStep('login')}
                 variant="outline"
-                className="mt-8 h-12 rounded-xl px-8">
+                className="mt-8 h-12 rounded-full px-8">
                 <Text>Ga naar inloggen</Text>
               </Button>
             </View>
@@ -455,16 +455,16 @@ export default function AuthScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
-                className="h-14 rounded-xl"
+                className="h-14 rounded-full"
               />
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive">
+                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
                   <Text className="text-sm text-destructive">{errorMsg}</Text>
                 </View>
               )}
               <Button
                 onPress={handleForgotPassword}
-                className="w-full mt-6 h-14 rounded-xl"
+                className="w-full mt-6 h-14 rounded-full"
                 disabled={!email || loading}>
                 {loading ? (
                   <Loader2 size={20} color="white" />
@@ -504,7 +504,7 @@ export default function AuthScreen() {
               <Button
                 onPress={() => setStep('login')}
                 variant="outline"
-                className="mt-8 h-12 rounded-xl px-8">
+                className="mt-8 h-12 rounded-full px-8">
                 <Text>Terug naar inloggen</Text>
               </Button>
             </View>
