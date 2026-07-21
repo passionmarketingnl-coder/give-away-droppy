@@ -5,6 +5,7 @@ import {
   Platform,
   Pressable,
   RefreshControl,
+  ScrollView,
   TextInput,
   View,
 } from 'react-native';
@@ -69,18 +70,27 @@ export default function FeedScreen() {
   const [sortBy, setSortBy] = useState<SortBy>('newest');
   const [refreshing, setRefreshing] = useState(false);
 
-  // Scroll-collapse: logo+bell rij verdwijnt zodra user naar beneden scrolt.
-  // Search + chips blijven zichtbaar bovenaan.
+  // Scroll-collapse: hele header (logo+bell+search+chips) verdwijnt bij
+  // scroll down. Bij scroll terug naar top komt de header weer terug.
   const scrollY = useSharedValue(0);
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
     },
   });
-  const logoRowStyle = useAnimatedStyle(() => ({
-    height: interpolate(scrollY.value, [0, 60], [40, 0], Extrapolation.CLAMP),
-    opacity: interpolate(scrollY.value, [0, 40], [1, 0], Extrapolation.CLAMP),
-    marginBottom: interpolate(scrollY.value, [0, 60], [16, 0], Extrapolation.CLAMP),
+  const headerStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(scrollY.value, [0, 60], [1, 0], Extrapolation.CLAMP),
+    maxHeight: interpolate(scrollY.value, [0, 100], [500, 0], Extrapolation.CLAMP),
+    transform: [
+      {
+        translateY: interpolate(
+          scrollY.value,
+          [0, 100],
+          [0, -40],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
     overflow: 'hidden',
   }));
 
@@ -136,100 +146,106 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      {/* Brand app-header — full-width blauw. Logo+bell rij collapse't
-          bij scroll down, search+chips blijven altijd zichtbaar. */}
-      <View className="bg-primary pt-4 pb-4">
-        <View className="max-w-lg mx-auto w-full px-4">
-          <Animated.View
-            style={logoRowStyle}
-            className="flex-row items-center justify-between">
-            <Image
-              source={logoWhite}
-              style={{ width: 128, height: 32 }}
-              resizeMode="contain"
-            />
-            <Pressable
-              onPress={() => router.push('/notifications')}
-              className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative">
-              <Bell size={18} color="#ffffff" />
-              {unreadCount && unreadCount > 0 ? (
-                <View className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-droppi-pink items-center justify-center px-1">
-                  <Text className="text-[10px] font-poppins-700 text-white">
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Text>
-                </View>
-              ) : null}
-            </Pressable>
-          </Animated.View>
-
-          <View className="flex-row gap-2">
-            <View className="flex-1 relative">
-              <View className="absolute left-3.5 top-1/2 -translate-y-1/2 z-10">
-                <Search size={18} color="#ffffff" />
-              </View>
-              <TextInput
-                value={search}
-                onChangeText={setSearch}
-                placeholder="Zoek in jouw buurt..."
-                placeholderTextColor="rgba(255,255,255,0.7)"
-                className="w-full h-11 pl-10 pr-4 rounded-full bg-white/20 text-sm text-white font-sans"
-                style={Platform.select({
-                  web: { outline: 'none' } as any,
-                })}
+      {/* Complete header wrapper: collapse't bij scroll down (opacity + max-
+          height + translateY). Bevat zowel de blauwe brand-header (logo,
+          bell, search, filter) als de horizontale category-slider. */}
+      <Animated.View style={headerStyle}>
+        <View className="bg-primary pt-4 pb-4">
+          <View className="max-w-lg mx-auto w-full px-4">
+            <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
+              <Image
+                source={logoWhite}
+                style={{ width: 128, height: 32 }}
+                resizeMode="contain"
               />
+              <Pressable
+                onPress={() => router.push('/notifications')}
+                className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative">
+                <Bell size={18} color="#ffffff" />
+                {unreadCount && unreadCount > 0 ? (
+                  <View className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-droppi-pink items-center justify-center px-1">
+                    <Text className="text-[10px] font-poppins-700 text-white">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </Text>
+                  </View>
+                ) : null}
+              </Pressable>
             </View>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Pressable className="w-11 h-11 rounded-full bg-white/20 items-center justify-center">
-                  <SlidersHorizontal size={18} color="#ffffff" />
-                </Pressable>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel>
-                  <Text>Sorteren op</Text>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onPress={() => setSortBy('newest')}>
-                  <Clock size={16} color="hsl(238 45% 16%)" />
-                  <Text>Nieuwste eerst</Text>
-                </DropdownMenuItem>
-                <DropdownMenuItem onPress={() => setSortBy('ending')}>
-                  <ArrowUpDown size={16} color="hsl(238 45% 16%)" />
-                  <Text>Bijna afgelopen</Text>
-                </DropdownMenuItem>
-                <DropdownMenuItem onPress={() => setSortBy('popular')}>
-                  <Heart size={16} color="hsl(238 45% 16%)" />
-                  <Text>Meeste likes</Text>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+            <View className="flex-row gap-2">
+              <View className="flex-1 relative">
+                <View className="absolute left-3.5 top-1/2 -translate-y-1/2 z-10">
+                  <Search size={18} color="#ffffff" />
+                </View>
+                <TextInput
+                  value={search}
+                  onChangeText={setSearch}
+                  placeholder="Zoek in jouw buurt..."
+                  placeholderTextColor="rgba(255,255,255,0.7)"
+                  className="w-full h-11 pl-10 pr-4 rounded-full bg-white/20 text-sm text-white font-sans"
+                  style={Platform.select({
+                    web: { outline: 'none' } as any,
+                  })}
+                />
+              </View>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Pressable className="w-11 h-11 rounded-full bg-white/20 items-center justify-center">
+                    <SlidersHorizontal size={18} color="#ffffff" />
+                  </Pressable>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel>
+                    <Text>Sorteren op</Text>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onPress={() => setSortBy('newest')}>
+                    <Clock size={16} color="hsl(238 45% 16%)" />
+                    <Text>Nieuwste eerst</Text>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onPress={() => setSortBy('ending')}>
+                    <ArrowUpDown size={16} color="hsl(238 45% 16%)" />
+                    <Text>Bijna afgelopen</Text>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onPress={() => setSortBy('popular')}>
+                    <Heart size={16} color="hsl(238 45% 16%)" />
+                    <Text>Meeste likes</Text>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Category chips: multi-line wrap zodat alle categorieën zichtbaar
-          zijn op elk viewport (geen horizontale scroll-cut-off meer). */}
-      <View className="max-w-lg mx-auto w-full px-4 pt-3 pb-1">
-        <View className="flex-row flex-wrap gap-2">
-          {categories.map((cat) => {
-            const tint = CHIP_TINTS[cat];
-            const active = cat === selectedCategory;
-            return (
-              <Pressable
-                key={cat}
-                onPress={() => setSelectedCategory(cat)}
-                className="px-4 h-9 rounded-full items-center justify-center"
-                style={{ backgroundColor: active ? tint.activeBg : tint.bg }}>
-                <Text
-                  className="text-sm font-poppins-600"
-                  style={{ color: active ? tint.activeText : tint.text }}>
-                  {cat}
-                </Text>
-              </Pressable>
-            );
-          })}
+        {/* Category slider: horizontale ScrollView zodat alle chips langs
+            elkaar staan, user swipet/scrollt om ze allemaal te zien. */}
+        <View className="pt-3 pb-1">
+          <View className="max-w-lg mx-auto w-full">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}>
+              {categories.map((cat) => {
+                const tint = CHIP_TINTS[cat];
+                const active = cat === selectedCategory;
+                return (
+                  <Pressable
+                    key={cat}
+                    onPress={() => setSelectedCategory(cat)}
+                    className="px-4 h-9 rounded-full items-center justify-center"
+                    style={{ backgroundColor: active ? tint.activeBg : tint.bg }}>
+                    <Text
+                      className="text-sm font-poppins-600"
+                      style={{ color: active ? tint.activeText : tint.text }}>
+                      {cat}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      </Animated.View>
 
       <View className="max-w-lg mx-auto w-full flex-1">
         {isLoading ? (
