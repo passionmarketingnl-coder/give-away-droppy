@@ -109,10 +109,10 @@ export default function FeedScreen() {
       <View className="max-w-lg mx-auto w-full flex-1">
         {/* Brand app-header (Huisstijl 2.0) */}
         <View className="bg-primary px-4 pt-4 pb-5">
-          <View className="flex-row items-center justify-between mb-4">
+          <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
             <Image
               source={logoWhite}
-              style={{ width: 110, aspectRatio: 1200 / 304 }}
+              style={{ width: 128, height: 32 }}
               resizeMode="contain"
             />
             <Pressable
