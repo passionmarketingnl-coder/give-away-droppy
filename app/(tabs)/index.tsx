@@ -109,6 +109,21 @@ export default function FeedScreen() {
     return `${Math.floor(diff / 60000)}m over`;
   };
 
+  // Toont alleen de plaatsnaam. Strip NL postcodes (1234AB met optionele
+  // spatie) en huisnummers weg uit de display_location; pak het laatste
+  // niet-lege deel na comma-split (meestal de woonplaats).
+  const cleanLocation = (raw: string | null | undefined): string => {
+    if (!raw) return '';
+    const withoutPostcode = raw
+      .replace(/\b\d{4}\s?[A-Z]{2}\b/gi, '')
+      .trim();
+    const parts = withoutPostcode
+      .split(',')
+      .map((p) => p.trim())
+      .filter(Boolean);
+    return parts.pop() || withoutPostcode || '';
+  };
+
   const feedItems: PostCardData[] = (posts || []).map((post) => ({
     id: post.id,
     title: post.title,
@@ -126,9 +141,7 @@ export default function FeedScreen() {
       : 'Onbekend',
     posterAvatar: post.poster?.avatar_url || '',
     createdAt: post.created_at,
-    displayLocation: post.display_location
-      ? post.display_location.split(',').pop()?.trim() || ''
-      : '',
+    displayLocation: cleanLocation(post.display_location),
   }));
 
   const filtered = feedItems
