@@ -417,7 +417,7 @@ export default function AuthScreen() {
           {step === 'verify' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
               <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
-                <Mail size={32} color="hsl(207 90% 54%)" />
+                <Mail size={32} color="hsl(231 100% 71%)" />
               </View>
               <Text className="text-3xl font-heading text-foreground mb-3">
                 Bevestig je e-mail
@@ -488,7 +488,7 @@ export default function AuthScreen() {
           {step === 'forgot-sent' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
               <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
-                <Mail size={32} color="hsl(207 90% 54%)" />
+                <Mail size={32} color="hsl(231 100% 71%)" />
               </View>
               <Text className="text-3xl font-heading text-foreground mb-3">
                 Check je e-mail

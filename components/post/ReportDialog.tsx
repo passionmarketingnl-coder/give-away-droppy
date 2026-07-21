@@ -57,7 +57,7 @@ export default function ReportDialog({ postId }: ReportDialogProps) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="ghost" className="flex-row gap-2 justify-start px-0">
-            <Flag size={16} color="hsl(213 20% 46%)" />
+            <Flag size={16} color="hsl(232 15% 55%)" />
             <Text className="text-sm text-muted-foreground">Meld dit product</Text>
           </Button>
         </DialogTrigger>

@@ -31,7 +31,7 @@ export default function CommentsSection({ postId }: CommentsSectionProps) {
   return (
     <View className="gap-4">
       <View className="flex-row items-center gap-2">
-        <MessageCircle size={20} color="hsl(213 79% 13%)" />
+        <MessageCircle size={20} color="hsl(238 45% 16%)" />
         <Text className="font-bold text-foreground">
           Vragen ({comments?.length || 0})
         </Text>
@@ -61,7 +61,7 @@ export default function CommentsSection({ postId }: CommentsSectionProps) {
 
       {isLoading ? (
         <View className="items-center py-4">
-          <Loader2 size={20} color="hsl(213 20% 46%)" />
+          <Loader2 size={20} color="hsl(232 15% 55%)" />
         </View>
       ) : comments && comments.length > 0 ? (
         <View className="gap-3">
