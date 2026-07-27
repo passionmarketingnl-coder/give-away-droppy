@@ -168,7 +168,7 @@ export default function FeedScreen() {
             <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
               <Image
                 source={logoWhite}
-                style={{ width: 128, height: 32 }}
+                style={{ width: 100, height: 32 }}
                 resizeMode="contain"
               />
               <Pressable
