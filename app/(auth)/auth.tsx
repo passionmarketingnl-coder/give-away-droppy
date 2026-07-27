@@ -165,17 +165,42 @@ export default function AuthScreen() {
                 De weggeefhoek voor jouw buurt. Geef gratis weg, eerlijk verloot,
                 makkelijk opgehaald.
               </Text>
-              <View className="gap-4 w-full max-w-xs items-start">
+              <View className="gap-3 w-full max-w-xs">
                 {[
-                  'Plaats iets gratis in je buurt',
-                  'Buren doen mee met 1 tik',
-                  'Automatisch eerlijk verloot',
-                ].map((line) => (
-                  <View key={line} className="flex-row items-center gap-3">
-                    <View className="w-7 h-7 rounded-full bg-droppi-blue items-center justify-center">
-                      <Check size={16} color="white" strokeWidth={3} />
-                    </View>
-                    <Text className="text-sm text-white">{line}</Text>
+                  {
+                    line: 'Plaats iets gratis in je buurt',
+                    gradient: ['rgba(104,128,255,0.28)', 'rgba(104,128,255,0.04)'],
+                  },
+                  {
+                    line: 'Buren doen mee met 1 tik',
+                    gradient: ['rgba(246,95,231,0.28)', 'rgba(246,95,231,0.04)'],
+                  },
+                  {
+                    line: 'Automatisch eerlijk verloot',
+                    gradient: ['rgba(104,128,255,0.28)', 'rgba(246,95,231,0.28)'],
+                  },
+                ].map(({ line, gradient }) => (
+                  <View
+                    key={line}
+                    className="w-full h-14 rounded-full overflow-hidden border border-white/10">
+                    <LinearGradient
+                      colors={gradient as [string, string]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={{
+                        flex: 1,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingHorizontal: 12,
+                        gap: 12,
+                      }}>
+                      <View className="w-8 h-8 rounded-full bg-white/15 items-center justify-center">
+                        <Check size={16} color="white" strokeWidth={3} />
+                      </View>
+                      <Text className="text-sm text-white font-poppins-500 flex-1">
+                        {line}
+                      </Text>
+                    </LinearGradient>
                   </View>
                 ))}
               </View>
