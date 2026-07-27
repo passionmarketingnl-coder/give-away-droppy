@@ -34,7 +34,8 @@ import { Text } from '@/components/ui/text';
 import { usePosts } from '@/lib/hooks/usePosts';
 import { useUnreadNotificationCount } from '@/lib/hooks/useProfile';
 
-const logoWhite = require('../../assets/brand/logo-white.png');
+// Feed header: alleen het gradient ∞-icoon (geen wordmark).
+const brandIcon = require('../../assets/brand/icon.png');
 
 // Categorie tints: elke categorie z'n eigen brand-tint (uit Huisstijl 2.0
 // "Labels & Categorieën"). Active state → volle brand-kleur.
@@ -167,8 +168,8 @@ export default function FeedScreen() {
           <View className="max-w-lg mx-auto w-full px-4">
             <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
               <Image
-                source={logoWhite}
-                style={{ width: 100, height: 32 }}
+                source={brandIcon}
+                style={{ width: 64, height: 28 }}
                 resizeMode="contain"
               />
               <Pressable
