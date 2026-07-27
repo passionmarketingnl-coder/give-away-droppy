@@ -164,7 +164,7 @@ export default function FeedScreen() {
           height + translateY). Bevat zowel de blauwe brand-header (logo,
           bell, search, filter) als de horizontale category-slider. */}
       <Animated.View style={headerStyle}>
-        <View className="bg-primary pt-4 pb-4">
+        <View style={{ backgroundColor: '#18193f' }} className="pt-4 pb-4">
           <View className="max-w-lg mx-auto w-full px-4">
             <View className="flex-row items-center justify-between mb-4" style={{ height: 40 }}>
               <Image
