@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   Loader2,
@@ -23,8 +24,9 @@ import { supabase } from '@/lib/supabase/client';
 
 type Step = 'welcome' | 'login' | 'register' | 'verify' | 'forgot' | 'forgot-sent';
 
-// Welcome-scherm: gebruik variant met 'care and share' tagline eronder.
-const logoBlue = require('../../assets/brand/logo-blue-tagline.png');
+// Welcome-scherm op donkere navy achtergrond: witte wordmark zonder tagline
+// (de tagline "Don't use it? Share it." staat al bovenaan als kop).
+const logoWhite = require('../../assets/brand/logo-white-v2.png');
 
 export default function AuthScreen() {
   const [step, setStep] = useState<Step>('welcome');
@@ -138,26 +140,28 @@ export default function AuthScreen() {
     setStep('forgot-sent');
   };
 
+  // Hele auth-flow op donkere navy: onboarding + login/register/verify/forgot.
+  const inputClass = 'h-14 rounded-full bg-white/10 border-white/20 text-white';
+  const placeholderColor = 'rgba(255,255,255,0.5)';
+
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-background"
+      className="flex-1"
+      style={{ backgroundColor: '#18193f' }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerClassName="flex-grow"
         keyboardShouldPersistTaps="handled">
         <View className="flex-1 max-w-lg w-full mx-auto">
           {step === 'welcome' && (
-            <View className="flex-1 items-center justify-center px-6 py-12">
-              <Text className="font-poppins-600 text-sm text-muted-foreground text-center tracking-wider mb-6 uppercase">
-                Don't use it? Share it.
-              </Text>
+            <View className="flex-1 items-center justify-center px-6 py-10">
               <Image
-                source={logoBlue}
-                style={{ width: '80%', maxWidth: 280, aspectRatio: 1200 / 387 }}
-                className="mb-8"
+                source={logoWhite}
+                style={{ width: 240, height: 240 }}
+                className="mb-6"
                 resizeMode="contain"
               />
-              <Text className="text-base text-muted-foreground text-center mb-8 max-w-xs">
+              <Text className="text-base text-white/80 text-center mb-8 max-w-xs">
                 De weggeefhoek voor jouw buurt. Geef gratis weg, eerlijk verloot,
                 makkelijk opgehaald.
               </Text>
@@ -168,10 +172,10 @@ export default function AuthScreen() {
                   'Automatisch eerlijk verloot',
                 ].map((line) => (
                   <View key={line} className="flex-row items-center gap-3">
-                    <View className="w-7 h-7 rounded-full bg-droppi-green items-center justify-center">
-                      <Check size={16} color="hsl(238 45% 16%)" strokeWidth={3} />
+                    <View className="w-7 h-7 rounded-full bg-droppi-blue items-center justify-center">
+                      <Check size={16} color="white" strokeWidth={3} />
                     </View>
-                    <Text className="text-sm text-foreground">{line}</Text>
+                    <Text className="text-sm text-white">{line}</Text>
                   </View>
                 ))}
               </View>
@@ -180,16 +184,16 @@ export default function AuthScreen() {
                 className="w-full max-w-xs mt-10 h-14 rounded-full overflow-hidden"
                 style={Platform.select({
                   ios: {
-                    shadowColor: '#6880FF',
-                    shadowOpacity: 0.35,
+                    shadowColor: '#F65FE7',
+                    shadowOpacity: 0.45,
                     shadowRadius: 18,
                     shadowOffset: { width: 0, height: 8 },
                   },
                   android: { elevation: 8 },
-                  web: { boxShadow: '0 8px 22px rgba(104,128,255,0.35)' } as any,
+                  web: { boxShadow: '0 8px 22px rgba(246,95,231,0.45)' } as any,
                 })}>
                 <LinearGradient
-                  colors={['#6880FF', '#9FFA7F']}
+                  colors={['#6880FF', '#F65FE7']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={{
@@ -208,37 +212,47 @@ export default function AuthScreen() {
 
           {step === 'login' && (
             <View className="flex-1 px-6 pt-16">
-              <Text className="text-3xl font-heading text-foreground mb-2">Inloggen</Text>
-              <Text className="text-muted-foreground mb-8">
+              <Pressable
+                onPress={() => {
+                  clearMessages();
+                  setStep('welcome');
+                }}
+                className="w-10 h-10 rounded-full items-center justify-center bg-white/10 mb-6">
+                <ArrowLeft size={20} color="white" />
+              </Pressable>
+              <Text className="text-3xl font-heading text-white mb-2">Inloggen</Text>
+              <Text className="text-white/70 mb-8">
                 Log in met je e-mail en wachtwoord.
               </Text>
               <View className="gap-4">
                 <Input
                   placeholder="E-mailadres"
+                  placeholderTextColor={placeholderColor}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
                 <Input
                   placeholder="Wachtwoord"
+                  placeholderTextColor={placeholderColor}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                   autoComplete="current-password"
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
               </View>
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
-                  <Text className="text-sm text-destructive">{errorMsg}</Text>
+                <View className="mt-4 p-3 rounded-full bg-destructive/20 border border-destructive/60">
+                  <Text className="text-sm text-white">{errorMsg}</Text>
                 </View>
               )}
               {infoMsg && (
-                <View className="mt-4 p-3 rounded-full bg-primary/10 border border-primary">
-                  <Text className="text-sm text-foreground">{infoMsg}</Text>
+                <View className="mt-4 p-3 rounded-full bg-white/10 border border-white/20">
+                  <Text className="text-sm text-white">{infoMsg}</Text>
                 </View>
               )}
               <Button
@@ -248,7 +262,7 @@ export default function AuthScreen() {
                 {loading ? (
                   <Loader2 size={20} color="white" />
                 ) : (
-                  <Text className="font-bold">Inloggen</Text>
+                  <Text className="font-bold text-white">Inloggen</Text>
                 )}
               </Button>
               <Pressable
@@ -257,7 +271,7 @@ export default function AuthScreen() {
                   setStep('forgot');
                 }}
                 className="mt-3">
-                <Text className="text-sm text-muted-foreground text-center">
+                <Text className="text-sm text-white/60 text-center">
                   Wachtwoord vergeten?
                 </Text>
               </Pressable>
@@ -267,25 +281,25 @@ export default function AuthScreen() {
                 </Text>
               </Pressable>
               <View className="flex-row items-center gap-3 mt-6">
-                <View className="flex-1 h-px bg-border" />
-                <Text className="text-xs text-muted-foreground">of</Text>
-                <View className="flex-1 h-px bg-border" />
+                <View className="flex-1 h-px bg-white/20" />
+                <Text className="text-xs text-white/60">of</Text>
+                <View className="flex-1 h-px bg-white/20" />
               </View>
               <View className="flex-row gap-3 mt-4">
                 <Button
                   variant="outline"
                   onPress={showOAuthSoon}
-                  className="flex-1 h-14 rounded-full">
-                  <Text>Google</Text>
+                  className="flex-1 h-14 rounded-full bg-white/10 border-white/20">
+                  <Text className="text-white">Google</Text>
                 </Button>
                 <Button
                   variant="outline"
                   onPress={showOAuthSoon}
-                  className="flex-1 h-14 rounded-full">
-                  <Text>Apple</Text>
+                  className="flex-1 h-14 rounded-full bg-white/10 border-white/20">
+                  <Text className="text-white">Apple</Text>
                 </Button>
               </View>
-              <Text className="text-xs text-muted-foreground text-center mt-2">
+              <Text className="text-xs text-white/60 text-center mt-2">
                 Google/Apple: binnenkort beschikbaar
               </Text>
             </View>
@@ -293,65 +307,80 @@ export default function AuthScreen() {
 
           {step === 'register' && (
             <View className="flex-1 px-6 pt-16 pb-8">
-              <Text className="text-3xl font-heading text-foreground mb-2">
+              <Pressable
+                onPress={() => {
+                  clearMessages();
+                  setStep('welcome');
+                }}
+                className="w-10 h-10 rounded-full items-center justify-center bg-white/10 mb-6">
+                <ArrowLeft size={20} color="white" />
+              </Pressable>
+              <Text className="text-3xl font-heading text-white mb-2">
                 Account aanmaken
               </Text>
-              <Text className="text-muted-foreground mb-8">
+              <Text className="text-white/70 mb-8">
                 Vul je gegevens in om te starten.
               </Text>
               <View className="gap-4">
                 <Input
                   placeholder="Voornaam"
+                  placeholderTextColor={placeholderColor}
                   value={firstName}
                   onChangeText={setFirstName}
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
                 <Input
                   placeholder="Achternaam"
+                  placeholderTextColor={placeholderColor}
                   value={lastName}
                   onChangeText={setLastName}
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
                 <Input
                   placeholder="Telefoonnummer"
+                  placeholderTextColor={placeholderColor}
                   value={phone}
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
                   autoComplete="tel"
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
                 <View className="flex-row gap-3">
                   <Input
                     placeholder="Postcode"
+                    placeholderTextColor={placeholderColor}
                     value={postcode}
                     onChangeText={setPostcode}
                     autoCapitalize="characters"
                     maxLength={7}
-                    className="flex-1 h-14 rounded-full"
+                    className={`${inputClass} flex-1`}
                   />
                   <Input
                     placeholder="Nr."
+                    placeholderTextColor={placeholderColor}
                     value={houseNumber}
                     onChangeText={setHouseNumber}
-                    className="w-28 h-14 rounded-full"
+                    className={`${inputClass} w-28`}
                   />
                 </View>
                 <Input
                   placeholder="E-mailadres"
+                  placeholderTextColor={placeholderColor}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoComplete="email"
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
                 <Input
                   placeholder="Wachtwoord (min. 6 tekens)"
+                  placeholderTextColor={placeholderColor}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
                   autoComplete="new-password"
-                  className="h-14 rounded-full"
+                  className={inputClass}
                 />
               </View>
               <View className="gap-3 mt-4">
@@ -360,7 +389,7 @@ export default function AuthScreen() {
                     checked={termsAccepted}
                     onCheckedChange={setTermsAccepted}
                   />
-                  <Text className="text-sm text-foreground flex-1">
+                  <Text className="text-sm text-white flex-1">
                     Ik ga akkoord met de{' '}
                     <Text className="text-primary font-semibold underline">
                       Algemene Voorwaarden
@@ -372,7 +401,7 @@ export default function AuthScreen() {
                     checked={privacyAccepted}
                     onCheckedChange={setPrivacyAccepted}
                   />
-                  <Text className="text-sm text-foreground flex-1">
+                  <Text className="text-sm text-white flex-1">
                     Ik heb het{' '}
                     <Text className="text-primary font-semibold underline">
                       Privacybeleid
@@ -382,8 +411,8 @@ export default function AuthScreen() {
                 </View>
               </View>
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
-                  <Text className="text-sm text-destructive">{errorMsg}</Text>
+                <View className="mt-4 p-3 rounded-full bg-destructive/20 border border-destructive/60">
+                  <Text className="text-sm text-white">{errorMsg}</Text>
                 </View>
               )}
               <Button
@@ -404,7 +433,7 @@ export default function AuthScreen() {
                 {loading ? (
                   <Loader2 size={20} color="white" />
                 ) : (
-                  <Text className="font-bold">Registreren</Text>
+                  <Text className="font-bold text-white">Registreren</Text>
                 )}
               </Button>
               <Pressable onPress={() => setStep('login')} className="mt-4">
@@ -417,50 +446,59 @@ export default function AuthScreen() {
 
           {step === 'verify' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
-                <Mail size={32} color="hsl(231 100% 71%)" />
+              <View className="w-16 h-16 rounded-full bg-white/10 items-center justify-center mb-6">
+                <Mail size={32} color="#6880FF" />
               </View>
-              <Text className="text-3xl font-heading text-foreground mb-3">
+              <Text className="text-3xl font-heading text-white mb-3">
                 Bevestig je e-mail
               </Text>
-              <Text className="text-muted-foreground mb-2 max-w-xs text-center">
+              <Text className="text-white/70 mb-2 max-w-xs text-center">
                 We hebben een bevestigingslink gestuurd naar:
               </Text>
-              <Text className="font-bold text-foreground mb-6">{email}</Text>
-              <Text className="text-sm text-muted-foreground max-w-xs text-center">
+              <Text className="font-bold text-white mb-6">{email}</Text>
+              <Text className="text-sm text-white/70 max-w-xs text-center">
                 Klik op de link in de e-mail om je account te activeren. Daarna kun je
                 inloggen.
               </Text>
               <Button
                 onPress={() => setStep('login')}
                 variant="outline"
-                className="mt-8 h-12 rounded-full px-8">
-                <Text>Ga naar inloggen</Text>
+                className="mt-8 h-12 rounded-full px-8 bg-white/10 border-white/20">
+                <Text className="text-white">Ga naar inloggen</Text>
               </Button>
             </View>
           )}
 
           {step === 'forgot' && (
             <View className="flex-1 px-6 pt-16">
-              <Text className="text-3xl font-heading text-foreground mb-2">
+              <Pressable
+                onPress={() => {
+                  clearMessages();
+                  setStep('login');
+                }}
+                className="w-10 h-10 rounded-full items-center justify-center bg-white/10 mb-6">
+                <ArrowLeft size={20} color="white" />
+              </Pressable>
+              <Text className="text-3xl font-heading text-white mb-2">
                 Wachtwoord vergeten
               </Text>
-              <Text className="text-muted-foreground mb-8">
+              <Text className="text-white/70 mb-8">
                 Vul je e-mailadres in, we sturen je een link om een nieuw wachtwoord
                 in te stellen.
               </Text>
               <Input
                 placeholder="E-mailadres"
+                placeholderTextColor={placeholderColor}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
-                className="h-14 rounded-full"
+                className={inputClass}
               />
               {errorMsg && (
-                <View className="mt-4 p-3 rounded-full bg-destructive/10 border border-destructive">
-                  <Text className="text-sm text-destructive">{errorMsg}</Text>
+                <View className="mt-4 p-3 rounded-full bg-destructive/20 border border-destructive/60">
+                  <Text className="text-sm text-white">{errorMsg}</Text>
                 </View>
               )}
               <Button
@@ -470,7 +508,7 @@ export default function AuthScreen() {
                 {loading ? (
                   <Loader2 size={20} color="white" />
                 ) : (
-                  <Text className="font-bold">Stuur reset-link</Text>
+                  <Text className="font-bold text-white">Stuur reset-link</Text>
                 )}
               </Button>
               <Pressable
@@ -488,25 +526,25 @@ export default function AuthScreen() {
 
           {step === 'forgot-sent' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center mb-6">
-                <Mail size={32} color="hsl(231 100% 71%)" />
+              <View className="w-16 h-16 rounded-full bg-white/10 items-center justify-center mb-6">
+                <Mail size={32} color="#6880FF" />
               </View>
-              <Text className="text-3xl font-heading text-foreground mb-3">
+              <Text className="text-3xl font-heading text-white mb-3">
                 Check je e-mail
               </Text>
-              <Text className="text-muted-foreground mb-2 max-w-xs text-center">
+              <Text className="text-white/70 mb-2 max-w-xs text-center">
                 We hebben een reset-link gestuurd naar:
               </Text>
-              <Text className="font-bold text-foreground mb-6">{email}</Text>
-              <Text className="text-sm text-muted-foreground max-w-xs text-center">
+              <Text className="font-bold text-white mb-6">{email}</Text>
+              <Text className="text-sm text-white/70 max-w-xs text-center">
                 Klik op de link in de e-mail om een nieuw wachtwoord in te stellen.
                 Zie je geen mail? Check je spam.
               </Text>
               <Button
                 onPress={() => setStep('login')}
                 variant="outline"
-                className="mt-8 h-12 rounded-full px-8">
-                <Text>Terug naar inloggen</Text>
+                className="mt-8 h-12 rounded-full px-8 bg-white/10 border-white/20">
+                <Text className="text-white">Terug naar inloggen</Text>
               </Button>
             </View>
           )}

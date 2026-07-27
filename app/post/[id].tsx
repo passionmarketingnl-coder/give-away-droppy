@@ -151,16 +151,12 @@ export default function PostDetailScreen() {
               />
             ) : (
               <LinearGradient
-                colors={['#9FFA7F', '#6880FF']}
+                colors={['#6880FF', '#F65FE7']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={{ flex: 1 }}
               />
             )}
-            {/* Gratis pill */}
-            <View className="absolute top-4 left-16 px-3 py-1 rounded-full bg-white">
-              <Text className="text-xs font-poppins-600 text-primary">Gratis</Text>
-            </View>
             <Pressable
               onPress={() => router.back()}
               className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 items-center justify-center">
@@ -409,7 +405,7 @@ export default function PostDetailScreen() {
               })}>
               <LinearGradient
                 colors={
-                  post.user_has_liked ? ['#F65FE7', '#6880FF'] : ['#6880FF', '#9FFA7F']
+                  post.user_has_liked ? ['#F65FE7', '#6880FF'] : ['#6880FF', '#F65FE7']
                 }
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}

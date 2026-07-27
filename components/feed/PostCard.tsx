@@ -32,11 +32,10 @@ interface PostCardProps {
 
 // Simpele deterministische keuze uit brand-gradient varianten (Huisstijl 2.0).
 // Op basis van post.id zodat elke placeholder consistent dezelfde combo krijgt.
+// Alleen blauw↔roze varianten, matchend met het logo-gradient.
 const GRADIENT_VARIANTS: [string, string][] = [
-  ['#9FFA7F', '#6880FF'], // groen → blauw
-  ['#6880FF', '#F65FE7'], // blauw → roze
+  ['#6880FF', '#F65FE7'], // blauw → roze (logo)
   ['#F65FE7', '#6880FF'], // roze → blauw
-  ['#6880FF', '#9FFA7F'], // blauw → groen
 ];
 
 function gradientForId(id: string): [string, string] {
@@ -127,13 +126,9 @@ export default function PostCard({ post }: PostCardProps) {
             <Heart size={80} fill="white" color="white" />
           </View>
         )}
-        {/* Gratis pill (Huisstijl 2.0) */}
-        <View className="absolute top-3 left-3 px-3 py-1 rounded-full bg-white">
-          <Text className="text-xs font-poppins-600 text-primary">Gratis</Text>
-        </View>
-        {/* Status badge naast Gratis wanneer relevant */}
+        {/* Status badge alleen tonen wanneer niet actief */}
         {post.status !== 'active' && (
-          <View className="absolute top-3 left-20">
+          <View className="absolute top-3 left-3">
             <StatusBadge status={post.status} />
           </View>
         )}

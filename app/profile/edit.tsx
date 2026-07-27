@@ -261,18 +261,18 @@ export default function EditProfileScreen() {
               canSave
                 ? Platform.select({
                     ios: {
-                      shadowColor: '#6880FF',
-                      shadowOpacity: 0.35,
+                      shadowColor: '#F65FE7',
+                      shadowOpacity: 0.45,
                       shadowRadius: 18,
                       shadowOffset: { width: 0, height: 8 },
                     },
                     android: { elevation: 8 },
-                    web: { boxShadow: '0 8px 22px rgba(104,128,255,0.35)' } as any,
+                    web: { boxShadow: '0 8px 22px rgba(246,95,231,0.45)' } as any,
                   })
                 : undefined
             }>
             <LinearGradient
-              colors={['#6880FF', '#9FFA7F']}
+              colors={['#6880FF', '#F65FE7']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{

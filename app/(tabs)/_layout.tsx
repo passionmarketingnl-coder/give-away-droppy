@@ -1,14 +1,21 @@
 import { Redirect, Tabs } from 'expo-router';
 import { Platform, Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Home, MessageCircle, Plus, User } from 'lucide-react-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
 
 export default function TabsLayout() {
   const { user, loading } = useAuth();
+  const insets = useSafeAreaInsets();
 
   if (loading) return <View className="flex-1 bg-background" />;
   if (!user) return <Redirect href="/auth" />;
+
+  // Op iOS/Android voegen we bottom safe-area toe zodat labels niet
+  // achter de home-indicator vallen. Op web is insets.bottom = 0 → 12px
+  // padding om labels vrij te laten ademen.
+  const bottomInset = insets.bottom > 0 ? insets.bottom : 12;
 
   return (
     <Tabs
@@ -23,9 +30,9 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: 'hsl(0 0% 100%)',
           borderTopColor: 'hsl(232 15% 90%)',
-          height: 64,
-          paddingTop: 6,
-          paddingBottom: 8,
+          height: 60 + bottomInset,
+          paddingTop: 8,
+          paddingBottom: bottomInset,
         },
       }}>
       <Tabs.Screen
