@@ -10,6 +10,7 @@ import {
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowLeft, Loader2, Send } from 'lucide-react-native';
 
 import { Text } from '@/components/ui/text';
@@ -82,9 +83,25 @@ export default function ChatDetailScreen() {
           </View>
         ) : !messages || messages.length === 0 ? (
           <View className="flex-1 items-center justify-center px-6">
-            <Text className="text-muted-foreground text-sm text-center">
-              Begin het gesprek! Spreek af wanneer het item opgehaald kan worden.
-            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(246,95,231,0.22)',
+                borderRadius: 24,
+                overflow: 'hidden',
+                width: '100%',
+                maxWidth: 320,
+              }}>
+              <LinearGradient
+                colors={['rgba(104,128,255,0.16)', 'rgba(246,95,231,0.16)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ padding: 20, alignItems: 'center' }}>
+                <Text className="text-foreground text-sm text-center font-poppins-500">
+                  Begin het gesprek! Spreek af wanneer het item opgehaald kan worden.
+                </Text>
+              </LinearGradient>
+            </View>
           </View>
         ) : (
           <FlatList
@@ -97,28 +114,42 @@ export default function ChatDetailScreen() {
             }
             renderItem={({ item }) => {
               const isMine = item.sender_user_id === user?.id;
+              const timestamp = formatDistanceToNow(new Date(item.created_at), {
+                addSuffix: true,
+                locale: nl,
+              });
+              if (isMine) {
+                return (
+                  <View className="items-end">
+                    <View
+                      style={{
+                        maxWidth: '75%',
+                        borderRadius: 20,
+                        borderBottomRightRadius: 6,
+                        overflow: 'hidden',
+                      }}>
+                      <LinearGradient
+                        colors={['#6880FF', '#F65FE7']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={{ paddingHorizontal: 16, paddingVertical: 10 }}>
+                        <Text className="text-sm text-white">{item.body}</Text>
+                        <Text className="text-[10px] mt-1 font-poppins-500 text-white/70">
+                          {timestamp}
+                        </Text>
+                      </LinearGradient>
+                    </View>
+                  </View>
+                );
+              }
               return (
-                <View className={`${isMine ? 'items-end' : 'items-start'}`}>
+                <View className="items-start">
                   <View
-                    className={`max-w-[75%] px-4 py-3 rounded-2xl ${
-                      isMine
-                        ? 'bg-primary rounded-br-md'
-                        : 'bg-white border border-border rounded-bl-md'
-                    }`}>
-                    <Text
-                      className={`text-sm ${
-                        isMine ? 'text-primary-foreground' : 'text-foreground'
-                      }`}>
-                      {item.body}
-                    </Text>
-                    <Text
-                      className={`text-[10px] mt-1 font-poppins-500 ${
-                        isMine ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                      }`}>
-                      {formatDistanceToNow(new Date(item.created_at), {
-                        addSuffix: true,
-                        locale: nl,
-                      })}
+                    className="max-w-[75%] px-4 py-3 bg-white rounded-2xl rounded-bl-md"
+                    style={{ borderWidth: 1, borderColor: 'rgba(104,128,255,0.18)' }}>
+                    <Text className="text-sm text-foreground">{item.body}</Text>
+                    <Text className="text-[10px] mt-1 font-poppins-500 text-muted-foreground">
+                      {timestamp}
                     </Text>
                   </View>
                 </View>
@@ -142,7 +173,7 @@ export default function ChatDetailScreen() {
           <Pressable
             onPress={handleSend}
             disabled={!text.trim() || sendMessage.isPending}
-            className={`w-12 h-12 rounded-full bg-primary items-center justify-center ${
+            className={`w-12 h-12 rounded-full overflow-hidden ${
               !text.trim() || sendMessage.isPending ? 'opacity-50' : ''
             }`}
             style={
@@ -150,16 +181,22 @@ export default function ChatDetailScreen() {
                 ? undefined
                 : Platform.select({
                     ios: {
-                      shadowColor: '#6880FF',
-                      shadowOpacity: 0.35,
+                      shadowColor: '#F65FE7',
+                      shadowOpacity: 0.45,
                       shadowRadius: 12,
                       shadowOffset: { width: 0, height: 6 },
                     },
                     android: { elevation: 6 },
-                    web: { boxShadow: '0 6px 16px rgba(104,128,255,0.35)' } as any,
+                    web: { boxShadow: '0 6px 16px rgba(246,95,231,0.45)' } as any,
                   })
             }>
-            <Send size={20} color="white" />
+            <LinearGradient
+              colors={['#6880FF', '#F65FE7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+              <Send size={20} color="white" />
+            </LinearGradient>
           </Pressable>
         </View>
       </View>

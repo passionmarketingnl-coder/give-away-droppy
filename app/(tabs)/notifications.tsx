@@ -140,13 +140,31 @@ export default function NotificationsScreen() {
           </View>
         ) : !notifications || notifications.length === 0 ? (
           <View className="flex-1 items-center justify-center px-6">
-            <View className="w-16 h-16 rounded-full bg-secondary items-center justify-center mb-4">
-              <Bell size={32} color="hsl(232 15% 55%)" />
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(246,95,231,0.22)',
+                borderRadius: 24,
+                overflow: 'hidden',
+                width: '100%',
+                maxWidth: 320,
+              }}>
+              <LinearGradient
+                colors={['rgba(104,128,255,0.16)', 'rgba(246,95,231,0.16)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ padding: 24, alignItems: 'center', gap: 12 }}>
+                <View
+                  className="w-16 h-16 rounded-full items-center justify-center"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}>
+                  <Bell size={30} color="#6880FF" />
+                </View>
+                <Text className="font-poppins-700 text-foreground text-center">Geen meldingen</Text>
+                <Text className="text-sm text-muted-foreground text-center">
+                  Hier zie je updates over je lotingen en berichten.
+                </Text>
+              </LinearGradient>
             </View>
-            <Text className="font-poppins-600 text-foreground mb-1">Geen meldingen</Text>
-            <Text className="text-sm text-muted-foreground text-center">
-              Hier zie je updates over je lotingen en berichten.
-            </Text>
           </View>
         ) : (
           <FlatList

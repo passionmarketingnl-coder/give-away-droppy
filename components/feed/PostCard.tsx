@@ -44,6 +44,48 @@ function gradientForId(id: string): [string, string] {
   return GRADIENT_VARIANTS[hash % GRADIENT_VARIANTS.length];
 }
 
+// Category-tint (matcht met feed CHIP_TINTS). Card border, category chip
+// en progress-track kleuren zich naar de categorie zodat elke post visueel
+// hoort bij z'n groep zonder chaos.
+type CategoryTint = {
+  chipBg: string;
+  chipText: string;
+  border: string;
+  progressTrack: string;
+};
+
+const CATEGORY_BLUE: CategoryTint = {
+  chipBg: '#EEF1FF',
+  chipText: '#6880FF',
+  border: 'rgba(104,128,255,0.18)',
+  progressTrack: 'rgba(104,128,255,0.14)',
+};
+const CATEGORY_PINK: CategoryTint = {
+  chipBg: '#FDEAFB',
+  chipText: '#C33BB4',
+  border: 'rgba(246,95,231,0.2)',
+  progressTrack: 'rgba(246,95,231,0.14)',
+};
+const CATEGORY_GREEN: CategoryTint = {
+  chipBg: '#EFFDE9',
+  chipText: '#3F9F52',
+  border: 'rgba(63,159,82,0.22)',
+  progressTrack: 'rgba(159,250,127,0.24)',
+};
+const CATEGORY_NEUTRAL: CategoryTint = {
+  chipBg: '#F4F4F4',
+  chipText: '#5A5D78',
+  border: 'rgba(90,93,120,0.14)',
+  progressTrack: 'rgba(90,93,120,0.14)',
+};
+
+function tintForCategory(category: string): CategoryTint {
+  if (['Meubels', 'Elektronica', 'Sport'].includes(category)) return CATEGORY_BLUE;
+  if (['Kinderen', 'Boeken', 'Kleding'].includes(category)) return CATEGORY_PINK;
+  if (['Keuken', 'Tuin'].includes(category)) return CATEGORY_GREEN;
+  return CATEGORY_NEUTRAL;
+}
+
 export default function PostCard({ post }: PostCardProps) {
   const router = useRouter();
   const toggleLike = useToggleLike();
@@ -53,6 +95,7 @@ export default function PostCard({ post }: PostCardProps) {
   const isDummy = post.id.startsWith('demo-');
   const hasImage = !!post.imageUrl;
   const gradient = gradientForId(post.id);
+  const catTint = tintForCategory(post.category);
 
   const handleLike = () => {
     if (isDummy) return;
@@ -99,11 +142,14 @@ export default function PostCard({ post }: PostCardProps) {
     <Pressable
       onPress={handleOpen}
       className="bg-card rounded-2xl overflow-hidden"
-      style={Platform.select({
-        ios: { shadowColor: '#16183A', shadowOpacity: 0.08, shadowRadius: 24, shadowOffset: { width: 0, height: 10 } },
-        android: { elevation: 3 },
-        web: { boxShadow: '0 10px 30px rgba(20,24,58,0.08)' } as any,
-      })}>
+      style={[
+        { borderWidth: 1, borderColor: catTint.border },
+        Platform.select({
+          ios: { shadowColor: '#16183A', shadowOpacity: 0.08, shadowRadius: 24, shadowOffset: { width: 0, height: 10 } },
+          android: { elevation: 3 },
+          web: { boxShadow: '0 10px 30px rgba(20,24,58,0.08)' } as any,
+        }),
+      ]}>
       <Pressable
         onPress={handleImageDoubleTap}
         className="relative w-full aspect-[4/3] overflow-hidden">
@@ -188,8 +234,8 @@ export default function PostCard({ post }: PostCardProps) {
               <Text className="text-xs text-muted-foreground">{post.timeLeft}</Text>
             </View>
           )}
-          <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: '#EEF1FF' }}>
-            <Text className="text-xs font-poppins-600" style={{ color: '#6880FF' }}>
+          <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: catTint.chipBg }}>
+            <Text className="text-xs font-poppins-600" style={{ color: catTint.chipText }}>
               {post.category}
             </Text>
           </View>
@@ -206,7 +252,9 @@ export default function PostCard({ post }: PostCardProps) {
               </View>
               <Text className="text-xs font-poppins-700 text-foreground">{post.likeCount}/100</Text>
             </View>
-            <View className="h-1.5 rounded-full bg-secondary overflow-hidden">
+            <View
+              className="h-1.5 rounded-full overflow-hidden"
+              style={{ backgroundColor: catTint.progressTrack }}>
               <View
                 className="h-full rounded-full bg-primary"
                 style={{ width: `${progress}%` }}

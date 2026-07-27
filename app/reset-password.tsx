@@ -75,20 +75,36 @@ export default function ResetPasswordScreen() {
           )}
 
           {phase === 'invalid' && (
-            <View className="items-center justify-center flex-1 gap-4">
-              <Text className="text-3xl font-heading text-foreground text-center">
-                Reset-link niet geldig
-              </Text>
-              <Text className="text-muted-foreground text-center max-w-xs">
-                De link is verlopen of niet correct. Vraag een nieuwe reset-link aan
-                via het inlog-scherm.
-              </Text>
-              <Button
-                onPress={() => router.replace('/auth')}
-                variant="outline"
-                className="mt-4 h-12 rounded-full px-8">
-                <Text>Naar inloggen</Text>
-              </Button>
+            <View className="items-center justify-center flex-1">
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: 'rgba(228,72,72,0.24)',
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  width: '100%',
+                  maxWidth: 340,
+                }}>
+                <LinearGradient
+                  colors={['rgba(228,72,72,0.14)', 'rgba(246,95,231,0.1)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ padding: 24, alignItems: 'center', gap: 12 }}>
+                  <Text className="text-2xl font-heading text-foreground text-center">
+                    Reset-link niet geldig
+                  </Text>
+                  <Text className="text-muted-foreground text-center max-w-xs">
+                    De link is verlopen of niet correct. Vraag een nieuwe reset-link aan
+                    via het inlog-scherm.
+                  </Text>
+                  <Button
+                    onPress={() => router.replace('/auth')}
+                    variant="outline"
+                    className="mt-2 h-12 rounded-full px-8 bg-white">
+                    <Text>Naar inloggen</Text>
+                  </Button>
+                </LinearGradient>
+              </View>
             </View>
           )}
 
@@ -180,16 +196,34 @@ export default function ResetPasswordScreen() {
           )}
 
           {phase === 'done' && (
-            <View className="items-center justify-center flex-1 gap-3">
-              <View className="w-16 h-16 rounded-full bg-droppi-green/20 items-center justify-center mb-2">
-                <CheckCircle size={32} color="#16183A" />
+            <View className="items-center justify-center flex-1">
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: 'rgba(63,159,82,0.28)',
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  width: '100%',
+                  maxWidth: 340,
+                }}>
+                <LinearGradient
+                  colors={['rgba(159,250,127,0.28)', 'rgba(159,250,127,0.06)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ padding: 24, alignItems: 'center', gap: 12 }}>
+                  <View
+                    className="w-16 h-16 rounded-full items-center justify-center"
+                    style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}>
+                    <CheckCircle size={30} color="#3F9F52" />
+                  </View>
+                  <Text className="text-2xl font-heading text-foreground text-center">
+                    Wachtwoord bijgewerkt
+                  </Text>
+                  <Text className="text-muted-foreground text-center max-w-xs">
+                    Je bent nu ingelogd, we sturen je door naar de feed.
+                  </Text>
+                </LinearGradient>
               </View>
-              <Text className="text-3xl font-heading text-foreground text-center">
-                Wachtwoord bijgewerkt
-              </Text>
-              <Text className="text-muted-foreground text-center max-w-xs">
-                Je bent nu ingelogd, we sturen je door naar de feed.
-              </Text>
             </View>
           )}
         </View>
