@@ -208,33 +208,74 @@ export default function ProfileScreen() {
           </View>
 
           <View className="px-4 gap-2 pb-8">
-            <Pressable
-              onPress={() => router.push('/profile/edit')}
-              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
-              <Edit3 size={20} color="hsl(232 15% 55%)" />
-              <Text className="flex-1 font-poppins-600 text-foreground">Profiel bewerken</Text>
-              <ChevronRight size={20} color="hsl(232 15% 55%)" />
-            </Pressable>
-            <Pressable
-              onPress={() => signOut()}
-              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
-              <LogOut size={20} color="hsl(232 15% 55%)" />
-              <Text className="flex-1 font-poppins-600 text-foreground">Uitloggen</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setTermsOpen(true)}
-              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
-              <FileText size={20} color="hsl(232 15% 55%)" />
-              <Text className="flex-1 font-poppins-600 text-foreground">Algemene Voorwaarden</Text>
-              <ChevronRight size={20} color="hsl(232 15% 55%)" />
-            </Pressable>
-            <Pressable
-              onPress={() => setPrivacyOpen(true)}
-              className="flex-row items-center gap-3 px-4 py-4 bg-card rounded-2xl">
-              <Shield size={20} color="hsl(232 15% 55%)" />
-              <Text className="flex-1 font-poppins-600 text-foreground">Privacybeleid</Text>
-              <ChevronRight size={20} color="hsl(232 15% 55%)" />
-            </Pressable>
+            {[
+              {
+                key: 'edit',
+                label: 'Profiel bewerken',
+                Icon: Edit3,
+                iconColor: '#6880FF',
+                gradient: ['rgba(104,128,255,0.12)', 'rgba(104,128,255,0.02)'] as [string, string],
+                border: 'rgba(104,128,255,0.2)',
+                onPress: () => router.push('/profile/edit'),
+                chevron: true,
+              },
+              {
+                key: 'signout',
+                label: 'Uitloggen',
+                Icon: LogOut,
+                iconColor: '#D93838',
+                gradient: ['rgba(228,72,72,0.1)', 'rgba(228,72,72,0.02)'] as [string, string],
+                border: 'rgba(228,72,72,0.18)',
+                onPress: () => signOut(),
+                chevron: false,
+              },
+              {
+                key: 'terms',
+                label: 'Algemene Voorwaarden',
+                Icon: FileText,
+                iconColor: '#5A5D78',
+                gradient: ['rgba(90,93,120,0.08)', 'rgba(90,93,120,0.02)'] as [string, string],
+                border: 'rgba(90,93,120,0.16)',
+                onPress: () => setTermsOpen(true),
+                chevron: true,
+              },
+              {
+                key: 'privacy',
+                label: 'Privacybeleid',
+                Icon: Shield,
+                iconColor: '#5A5D78',
+                gradient: ['rgba(90,93,120,0.08)', 'rgba(90,93,120,0.02)'] as [string, string],
+                border: 'rgba(90,93,120,0.16)',
+                onPress: () => setPrivacyOpen(true),
+                chevron: true,
+              },
+            ].map(({ key, label, Icon, iconColor, gradient, border, onPress, chevron }) => (
+              <Pressable
+                key={key}
+                onPress={onPress}
+                style={{
+                  borderWidth: 1,
+                  borderColor: border,
+                  borderRadius: 20,
+                  overflow: 'hidden',
+                }}>
+                <LinearGradient
+                  colors={gradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: 12,
+                    paddingHorizontal: 16,
+                    paddingVertical: 14,
+                  }}>
+                  <Icon size={20} color={iconColor} />
+                  <Text className="flex-1 font-poppins-600 text-foreground">{label}</Text>
+                  {chevron && <ChevronRight size={20} color="hsl(232 15% 55%)" />}
+                </LinearGradient>
+              </Pressable>
+            ))}
           </View>
         </View>
       </ScrollView>

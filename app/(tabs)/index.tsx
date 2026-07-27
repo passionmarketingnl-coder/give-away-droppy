@@ -18,6 +18,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowUpDown, Bell, Clock, Heart, Search, SlidersHorizontal } from 'lucide-react-native';
 
 import PostCard, { type PostCardData } from '@/components/feed/PostCard';
@@ -270,12 +271,28 @@ export default function FeedScreen() {
           </View>
         ) : filtered.length === 0 ? (
           <View className="flex-1 items-center justify-center px-4">
-            <Text className="text-muted-foreground text-lg font-poppins-600">
-              Nog geen items in je buurt
-            </Text>
-            <Text className="text-muted-foreground text-sm mt-1">
-              Wees de eerste die iets weggeeft!
-            </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(246,95,231,0.22)',
+                borderRadius: 24,
+                overflow: 'hidden',
+                width: '100%',
+                maxWidth: 320,
+              }}>
+              <LinearGradient
+                colors={['rgba(104,128,255,0.16)', 'rgba(246,95,231,0.16)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{ padding: 24, alignItems: 'center', gap: 8 }}>
+                <Text className="text-foreground text-lg font-poppins-700 text-center">
+                  Nog geen items in je buurt
+                </Text>
+                <Text className="text-muted-foreground text-sm text-center">
+                  Wees de eerste die iets weggeeft!
+                </Text>
+              </LinearGradient>
+            </View>
           </View>
         ) : (
           <AnimatedFlatList

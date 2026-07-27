@@ -217,59 +217,95 @@ export default function PostDetailScreen() {
           </View>
 
           {showProgress && (
-            <View className="gap-2 p-4 rounded-2xl bg-primary/5 border border-primary/20">
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center gap-1.5">
-                  <Flame size={16} color="#6880FF" />
-                  <Text className="text-sm font-poppins-700 text-primary">
-                    Nog {likesNeeded} likes tot de loting!
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(104,128,255,0.24)',
+                borderRadius: 20,
+                overflow: 'hidden',
+              }}>
+              <LinearGradient
+                colors={['rgba(104,128,255,0.18)', 'rgba(246,95,231,0.14)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ padding: 16, gap: 8 }}>
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-row items-center gap-1.5">
+                    <Flame size={16} color="#6880FF" />
+                    <Text className="text-sm font-poppins-700 text-primary">
+                      Nog {likesNeeded} likes tot de loting!
+                    </Text>
+                  </View>
+                  <Text className="text-sm font-poppins-700 text-foreground">
+                    {post.like_count}/100
                   </Text>
                 </View>
-                <Text className="text-sm font-poppins-700 text-foreground">
-                  {post.like_count}/100
-                </Text>
-              </View>
-              <View className="h-2 rounded-full bg-secondary overflow-hidden">
-                <View
-                  className="h-full rounded-full bg-primary"
-                  style={{ width: `${progress}%` }}
-                />
-              </View>
+                <View className="h-2 rounded-full bg-white/40 overflow-hidden">
+                  <View
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${progress}%` }}
+                  />
+                </View>
+              </LinearGradient>
             </View>
           )}
 
           {isRaffled && (
-            <View className="p-4 rounded-2xl bg-droppi-green/20 border border-droppi-green gap-3">
-              <View className="flex-row items-center gap-2">
-                <Trophy size={20} color="#16183A" />
-                <Text className="font-poppins-700 text-foreground">Loting afgerond!</Text>
-              </View>
-              <Text className="text-sm text-foreground/80">
-                {isPoster
-                  ? 'Er is een winnaar gekozen. Neem contact op via de chat om de ophaling te regelen.'
-                  : 'De loting voor dit item is afgerond. De winnaar is op de hoogte gesteld.'}
-              </Text>
-              {conversation && (
-                <Button
-                  onPress={handleGoToChat}
-                  variant="outline"
-                  className="w-full h-11 rounded-full bg-white">
-                  <MessageCircle size={16} color="#16183A" />
-                  <Text className="font-poppins-600">Open chat</Text>
-                </Button>
-              )}
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(63,159,82,0.28)',
+                borderRadius: 20,
+                overflow: 'hidden',
+              }}>
+              <LinearGradient
+                colors={['rgba(159,250,127,0.28)', 'rgba(159,250,127,0.06)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ padding: 16, gap: 12 }}>
+                <View className="flex-row items-center gap-2">
+                  <Trophy size={20} color="#16183A" />
+                  <Text className="font-poppins-700 text-foreground">Loting afgerond!</Text>
+                </View>
+                <Text className="text-sm text-foreground/80">
+                  {isPoster
+                    ? 'Er is een winnaar gekozen. Neem contact op via de chat om de ophaling te regelen.'
+                    : 'De loting voor dit item is afgerond. De winnaar is op de hoogte gesteld.'}
+                </Text>
+                {conversation && (
+                  <Button
+                    onPress={handleGoToChat}
+                    variant="outline"
+                    className="w-full h-11 rounded-full bg-white">
+                    <MessageCircle size={16} color="#16183A" />
+                    <Text className="font-poppins-600">Open chat</Text>
+                  </Button>
+                )}
+              </LinearGradient>
             </View>
           )}
 
           {isPickedUp && (
-            <View className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
-              <View className="flex-row items-center gap-2">
-                <CheckCircle size={20} color="#6880FF" />
-                <Text className="font-poppins-700 text-foreground">Opgehaald!</Text>
-              </View>
-              <Text className="text-sm text-muted-foreground mt-1">
-                Dit item is succesvol opgehaald. Bedankt voor het delen!
-              </Text>
+            <View
+              style={{
+                borderWidth: 1,
+                borderColor: 'rgba(104,128,255,0.22)',
+                borderRadius: 20,
+                overflow: 'hidden',
+              }}>
+              <LinearGradient
+                colors={['rgba(104,128,255,0.14)', 'rgba(104,128,255,0.02)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={{ padding: 16 }}>
+                <View className="flex-row items-center gap-2">
+                  <CheckCircle size={20} color="#6880FF" />
+                  <Text className="font-poppins-700 text-foreground">Opgehaald!</Text>
+                </View>
+                <Text className="text-sm text-muted-foreground mt-1">
+                  Dit item is succesvol opgehaald. Bedankt voor het delen!
+                </Text>
+              </LinearGradient>
             </View>
           )}
 
@@ -346,20 +382,32 @@ export default function PostDetailScreen() {
             </View>
           )}
 
-          <View className="flex-row items-center gap-3 py-3 border-y border-border">
-            <View className="w-11 h-11 rounded-full bg-primary/10 items-center justify-center">
-              <Text className="text-primary font-poppins-700 text-lg">{posterInitial}</Text>
-            </View>
-            <View className="flex-1">
-              <Text className="font-poppins-700 text-foreground">{posterName}</Text>
-              <Text className="text-xs text-muted-foreground">
-                Geplaatst{' '}
-                {formatDistanceToNow(new Date(post.created_at), {
-                  addSuffix: true,
-                  locale: nl,
-                })}
-              </Text>
-            </View>
+          <View
+            style={{
+              borderWidth: 1,
+              borderColor: 'rgba(104,128,255,0.18)',
+              borderRadius: 20,
+              overflow: 'hidden',
+            }}>
+            <LinearGradient
+              colors={['rgba(104,128,255,0.1)', 'rgba(104,128,255,0.02)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 }}>
+              <View className="w-11 h-11 rounded-full items-center justify-center" style={{ backgroundColor: 'rgba(104,128,255,0.2)' }}>
+                <Text className="text-primary font-poppins-700 text-lg">{posterInitial}</Text>
+              </View>
+              <View className="flex-1">
+                <Text className="font-poppins-700 text-foreground">{posterName}</Text>
+                <Text className="text-xs text-muted-foreground">
+                  Geplaatst{' '}
+                  {formatDistanceToNow(new Date(post.created_at), {
+                    addSuffix: true,
+                    locale: nl,
+                  })}
+                </Text>
+              </View>
+            </LinearGradient>
           </View>
 
           <View>
