@@ -1,7 +1,8 @@
 /**
- * Regenereert de brand PNG's uit de SVG bronbestanden.
- * Trim snijdt de transparante rand weg zodat het logo strak tegen zijn eigen
- * letters ligt (SVG viewBox had ruime padding boven en onder).
+ * Regenereert de gebruikte brand PNG's door de v2-originelen te trimmen.
+ * Originele v2 PNG's blijven onaangeroerd als backup; de app gebruikt de
+ * getrimde versies (logo-blue.png / logo-white.png / logo-blue-tagline.png
+ * / favicon.png).
  */
 import sharp from 'sharp';
 import { writeFileSync } from 'node:fs';
@@ -9,7 +10,7 @@ import path from 'node:path';
 
 const brandDir = path.resolve(process.cwd(), 'assets/brand');
 
-async function trimResizeSvg({ src, dst, width }) {
+async function trimResize({ src, dst, width }) {
   const buffer = await sharp(path.join(brandDir, src))
     .resize({ width })
     .trim()
@@ -21,9 +22,12 @@ async function trimResizeSvg({ src, dst, width }) {
 }
 
 async function main() {
-  await trimResizeSvg({ src: 'logo-blue.svg', dst: 'logo-blue.png', width: 1200 });
-  await trimResizeSvg({ src: 'logo-white.svg', dst: 'logo-white.png', width: 1200 });
-  await trimResizeSvg({ src: 'favicon.svg', dst: 'favicon.png', width: 512 });
+  // v2 assets van huisstijl update (2026-07-27)
+  await trimResize({ src: 'logo-blue-v2.png', dst: 'logo-blue.png', width: 1200 });
+  await trimResize({ src: 'logo-white-v2.png', dst: 'logo-white.png', width: 1200 });
+  await trimResize({ src: 'logo-blue-tagline-v2.png', dst: 'logo-blue-tagline.png', width: 1200 });
+  await trimResize({ src: 'icon-v2.png', dst: 'favicon.png', width: 512 });
+  await trimResize({ src: 'icon-v2.png', dst: 'icon.png', width: 1024 });
 }
 
 main().catch((e) => {

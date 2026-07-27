@@ -23,7 +23,8 @@ import { supabase } from '@/lib/supabase/client';
 
 type Step = 'welcome' | 'login' | 'register' | 'verify' | 'forgot' | 'forgot-sent';
 
-const logoBlue = require('../../assets/brand/logo-blue.png');
+// Welcome-scherm: gebruik variant met 'care and share' tagline eronder.
+const logoBlue = require('../../assets/brand/logo-blue-tagline.png');
 
 export default function AuthScreen() {
   const [step, setStep] = useState<Step>('welcome');
@@ -152,7 +153,7 @@ export default function AuthScreen() {
               </Text>
               <Image
                 source={logoBlue}
-                style={{ width: '80%', maxWidth: 280, aspectRatio: 1200 / 304 }}
+                style={{ width: '80%', maxWidth: 280, aspectRatio: 1200 / 387 }}
                 className="mb-8"
                 resizeMode="contain"
               />
