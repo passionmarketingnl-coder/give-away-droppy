@@ -113,7 +113,7 @@ export default function CreateScreen() {
       className="flex-1 bg-background"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       {/* Brand app-header (full-width) */}
-      <View className="bg-primary pt-4 pb-5">
+      <View style={{ backgroundColor: "#18193f" }} className="pt-4 pb-5">
         <View className="max-w-lg mx-auto w-full px-4">
           <Text className="text-3xl font-heading text-white">Iets weggeven</Text>
           <Text className="text-sm text-white/80 mt-1">

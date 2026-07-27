@@ -80,7 +80,7 @@ export default function NotificationsScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="bg-primary pt-4 pb-5">
+      <View style={{ backgroundColor: "#18193f" }} className="pt-4 pb-5">
         <View className="max-w-lg mx-auto w-full px-4">
           <Text className="text-3xl font-heading text-white">Meldingen</Text>
         </View>

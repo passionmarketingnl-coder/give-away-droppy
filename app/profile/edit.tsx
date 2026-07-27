@@ -168,7 +168,7 @@ export default function EditProfileScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       {/* Brand app-header (full-width) */}
-      <View className="bg-primary pt-4 pb-5">
+      <View style={{ backgroundColor: "#18193f" }} className="pt-4 pb-5">
         <View className="max-w-lg mx-auto w-full px-4 flex-row items-center gap-3">
           <Pressable
             onPress={() => router.back()}

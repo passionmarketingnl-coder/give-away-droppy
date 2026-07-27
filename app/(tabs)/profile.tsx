@@ -60,7 +60,7 @@ export default function ProfileScreen() {
   return (
     <View className="flex-1 bg-background">
       {/* Brand header full-width met avatar + naam prominent */}
-      <View className="bg-primary pt-4 pb-8">
+      <View style={{ backgroundColor: "#18193f" }} className="pt-4 pb-8">
         <View className="max-w-lg mx-auto w-full px-4">
           <Text className="text-3xl font-heading text-white mb-6">Profiel</Text>
 
