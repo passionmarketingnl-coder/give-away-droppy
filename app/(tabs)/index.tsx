@@ -178,10 +178,21 @@ export default function FeedScreen() {
                 className="w-10 h-10 rounded-full bg-white/20 items-center justify-center relative">
                 <Bell size={18} color="#ffffff" />
                 {unreadCount && unreadCount > 0 ? (
-                  <View className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full bg-droppi-pink items-center justify-center px-1">
-                    <Text className="text-[10px] font-poppins-700 text-white">
-                      {unreadCount > 9 ? '9+' : unreadCount}
-                    </Text>
+                  <View className="absolute -top-1 -right-1 min-w-[18px] h-[18px] rounded-full overflow-hidden">
+                    <LinearGradient
+                      colors={['#F65FE7', '#6880FF']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingHorizontal: 4,
+                      }}>
+                      <Text className="text-[10px] font-poppins-700 text-white">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </Text>
+                    </LinearGradient>
                   </View>
                 ) : null}
               </Pressable>

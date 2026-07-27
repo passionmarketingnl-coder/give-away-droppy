@@ -312,17 +312,28 @@ export default function EditProfileScreen() {
 
       {toast && (
         <View
-          className={`absolute top-16 left-4 right-4 p-3 rounded-2xl ${
-            toast.kind === 'success'
-              ? 'bg-droppi-green/20 border border-droppi-green'
-              : 'bg-destructive/10 border border-destructive'
-          }`}>
-          <Text
-            className={`text-sm ${
-              toast.kind === 'success' ? 'text-foreground' : 'text-destructive'
-            }`}>
-            {toast.msg}
-          </Text>
+          className="absolute top-16 left-4 right-4 rounded-2xl overflow-hidden"
+          style={{
+            borderWidth: 1,
+            borderColor:
+              toast.kind === 'success' ? 'rgba(63,159,82,0.4)' : 'rgba(228,72,72,0.4)',
+          }}>
+          <LinearGradient
+            colors={
+              toast.kind === 'success'
+                ? ['rgba(159,250,127,0.95)', 'rgba(239,253,233,0.95)']
+                : ['rgba(228,72,72,0.14)', 'rgba(246,95,231,0.1)']
+            }
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ padding: 12 }}>
+            <Text
+              className={`text-sm font-poppins-600 ${
+                toast.kind === 'success' ? 'text-foreground' : 'text-destructive'
+              }`}>
+              {toast.msg}
+            </Text>
+          </LinearGradient>
         </View>
       )}
     </KeyboardAvoidingView>
