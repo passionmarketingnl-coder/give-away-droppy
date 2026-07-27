@@ -185,16 +185,34 @@ export default function EditProfileScreen() {
         keyboardShouldPersistTaps="handled">
         <View className="max-w-lg mx-auto w-full px-4 py-6 gap-6">
           <View className="items-center gap-3">
-            <Pressable
-              onPress={pickAvatar}
-              className="relative w-24 h-24 rounded-full overflow-hidden bg-primary/10 items-center justify-center">
-              {avatarPreview ? (
-                <Image source={{ uri: avatarPreview }} className="w-full h-full" />
-              ) : (
-                <Text className="text-primary font-heading text-3xl">{initials}</Text>
-              )}
-              <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary items-center justify-center">
-                <Camera size={16} color="white" />
+            <Pressable onPress={pickAvatar} className="relative">
+              {/* Gradient ring rond de avatar (logo blauw→roze) */}
+              <LinearGradient
+                colors={['#6880FF', '#F65FE7']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  padding: 3,
+                }}>
+                <View className="flex-1 rounded-full overflow-hidden bg-background items-center justify-center">
+                  {avatarPreview ? (
+                    <Image source={{ uri: avatarPreview }} className="w-full h-full" />
+                  ) : (
+                    <Text className="text-primary font-heading text-3xl">{initials}</Text>
+                  )}
+                </View>
+              </LinearGradient>
+              <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full overflow-hidden">
+                <LinearGradient
+                  colors={['#6880FF', '#F65FE7']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <Camera size={16} color="white" />
+                </LinearGradient>
               </View>
             </Pressable>
             <Pressable onPress={pickAvatar}>

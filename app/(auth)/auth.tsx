@@ -471,8 +471,14 @@ export default function AuthScreen() {
 
           {step === 'verify' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <View className="w-16 h-16 rounded-full bg-white/10 items-center justify-center mb-6">
-                <Mail size={32} color="#6880FF" />
+              <View className="w-16 h-16 rounded-full overflow-hidden mb-6">
+                <LinearGradient
+                  colors={['rgba(104,128,255,0.45)', 'rgba(246,95,231,0.45)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <Mail size={32} color="white" />
+                </LinearGradient>
               </View>
               <Text className="text-3xl font-heading text-white mb-3">
                 Bevestig je e-mail
@@ -551,8 +557,14 @@ export default function AuthScreen() {
 
           {step === 'forgot-sent' && (
             <View className="flex-1 items-center justify-center px-6 py-12">
-              <View className="w-16 h-16 rounded-full bg-white/10 items-center justify-center mb-6">
-                <Mail size={32} color="#6880FF" />
+              <View className="w-16 h-16 rounded-full overflow-hidden mb-6">
+                <LinearGradient
+                  colors={['rgba(104,128,255,0.45)', 'rgba(246,95,231,0.45)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                  <Mail size={32} color="white" />
+                </LinearGradient>
               </View>
               <Text className="text-3xl font-heading text-white mb-3">
                 Check je e-mail

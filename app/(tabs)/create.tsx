@@ -145,17 +145,23 @@ export default function CreateScreen() {
               {images.length < 5 && (
                 <Pressable
                   onPress={pickImages}
-                  className="w-24 h-24 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 items-center justify-center gap-1">
-                  {images.length === 0 ? (
-                    <>
-                      <Camera size={22} color="hsl(231 100% 71%)" />
-                      <Text className="text-xs text-primary font-poppins-600">
-                        Voeg toe
-                      </Text>
-                    </>
-                  ) : (
-                    <Plus size={24} color="hsl(231 100% 71%)" />
-                  )}
+                  className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-dashed border-primary/40">
+                  <LinearGradient
+                    colors={['rgba(104,128,255,0.12)', 'rgba(246,95,231,0.12)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                    {images.length === 0 ? (
+                      <>
+                        <Camera size={22} color="hsl(231 100% 71%)" />
+                        <Text className="text-xs text-primary font-poppins-600">
+                          Voeg toe
+                        </Text>
+                      </>
+                    ) : (
+                      <Plus size={24} color="hsl(231 100% 71%)" />
+                    )}
+                  </LinearGradient>
                 </Pressable>
               )}
             </View>
@@ -187,19 +193,33 @@ export default function CreateScreen() {
           <View className="flex-row flex-wrap gap-2">
             {categories.map((cat) => {
               const active = category === cat;
+              if (active) {
+                return (
+                  <Pressable
+                    key={cat}
+                    onPress={() => setCategory(cat)}
+                    className="h-10 rounded-full overflow-hidden">
+                    <LinearGradient
+                      colors={['#6880FF', '#F65FE7']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                      style={{
+                        flex: 1,
+                        paddingHorizontal: 16,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      <Text className="text-sm font-poppins-600 text-white">{cat}</Text>
+                    </LinearGradient>
+                  </Pressable>
+                );
+              }
               return (
                 <Pressable
                   key={cat}
                   onPress={() => setCategory(cat)}
-                  className={`px-4 h-10 rounded-full items-center justify-center ${
-                    active ? 'bg-primary' : 'bg-white border border-border'
-                  }`}>
-                  <Text
-                    className={`text-sm font-poppins-600 ${
-                      active ? 'text-white' : 'text-foreground'
-                    }`}>
-                    {cat}
-                  </Text>
+                  className="px-4 h-10 rounded-full items-center justify-center bg-white border border-border">
+                  <Text className="text-sm font-poppins-600 text-foreground">{cat}</Text>
                 </Pressable>
               );
             })}
@@ -219,13 +239,25 @@ export default function CreateScreen() {
           />
         </View>
 
-        <View className="p-4 rounded-2xl bg-primary/5 border border-primary/20">
-          <Text className="text-sm text-foreground leading-relaxed">
-            📍 Je product wordt zichtbaar voor buren binnen{' '}
-            <Text className="font-poppins-700">7 km</Text>.
-            {'\n'}
-            ⏱️ Na 24 uur of bij 100 likes wordt automatisch een winnaar geloot.
-          </Text>
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: 'rgba(104,128,255,0.22)',
+            borderRadius: 20,
+            overflow: 'hidden',
+          }}>
+          <LinearGradient
+            colors={['rgba(104,128,255,0.14)', 'rgba(246,95,231,0.12)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ padding: 16 }}>
+            <Text className="text-sm text-foreground leading-relaxed">
+              📍 Je product wordt zichtbaar voor buren binnen{' '}
+              <Text className="font-poppins-700">7 km</Text>.
+              {'\n'}
+              ⏱️ Na 24 uur of bij 100 likes wordt automatisch een winnaar geloot.
+            </Text>
+          </LinearGradient>
         </View>
       </ScrollView>
 

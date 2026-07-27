@@ -83,13 +83,22 @@ export default function ProfileScreen() {
           <Text className="text-3xl font-heading text-white mb-6">Profiel</Text>
 
           <View className="flex-row items-center gap-4">
-            <View className="w-20 h-20 rounded-full bg-white/20 items-center justify-center overflow-hidden">
-              {avatarUrl ? (
-                <Image source={{ uri: avatarUrl }} className="w-full h-full" />
-              ) : (
-                <Text className="text-white font-heading text-3xl">{initials}</Text>
-              )}
-            </View>
+            {/* Gradient ring rond avatar (logo blauw→roze) */}
+            <LinearGradient
+              colors={['#6880FF', '#F65FE7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{ width: 84, height: 84, borderRadius: 42, padding: 3 }}>
+              <View
+                className="flex-1 rounded-full items-center justify-center overflow-hidden"
+                style={{ backgroundColor: 'rgba(255,255,255,0.14)' }}>
+                {avatarUrl ? (
+                  <Image source={{ uri: avatarUrl }} className="w-full h-full" />
+                ) : (
+                  <Text className="text-white font-heading text-3xl">{initials}</Text>
+                )}
+              </View>
+            </LinearGradient>
             <View className="flex-1">
               <Text className="text-xl font-poppins-700 text-white" numberOfLines={1}>
                 {displayName}
