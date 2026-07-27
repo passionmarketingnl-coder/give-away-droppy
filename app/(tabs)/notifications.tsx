@@ -2,6 +2,7 @@ import { FlatList, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   Bell,
   CheckCircle,
@@ -34,16 +35,62 @@ const iconMap: Record<string, IconComponent> = {
   pickup_confirm: CheckCircle,
 };
 
-const colorMap: Record<string, { bg: string; iconColor: string }> = {
-  raffle_won: { bg: 'bg-droppi-green/20', iconColor: 'hsl(238 45% 16%)' },
-  comment: { bg: 'bg-primary/10', iconColor: 'hsl(231 100% 71%)' },
-  reply: { bg: 'bg-primary/10', iconColor: 'hsl(231 100% 71%)' },
-  raffle_completed: { bg: 'bg-secondary', iconColor: 'hsl(232 15% 55%)' },
-  reroll: { bg: 'bg-droppi-pink/15', iconColor: 'hsl(305 89% 67%)' },
-  chat_message: { bg: 'bg-primary/10', iconColor: 'hsl(231 100% 71%)' },
-  moderation: { bg: 'bg-destructive/10', iconColor: 'hsl(0 72% 51%)' },
-  daily_update: { bg: 'bg-primary/10', iconColor: 'hsl(231 100% 71%)' },
-  pickup_confirm: { bg: 'bg-droppi-green/20', iconColor: 'hsl(238 45% 16%)' },
+// Tint per notification-type. Gradient loopt links→rechts, sterker aan de
+// icon-kant zodat de badge in z'n eigen kleur baadt en de tekst rustig blijft.
+type Tint = {
+  gradient: [string, string];
+  gradientUnread: [string, string];
+  iconBg: string;
+  iconColor: string;
+  border: string;
+};
+
+const BLUE: Tint = {
+  gradient: ['rgba(104,128,255,0.12)', 'rgba(104,128,255,0.02)'],
+  gradientUnread: ['rgba(104,128,255,0.22)', 'rgba(104,128,255,0.04)'],
+  iconBg: 'rgba(104,128,255,0.18)',
+  iconColor: '#6880FF',
+  border: 'rgba(104,128,255,0.18)',
+};
+const PINK: Tint = {
+  gradient: ['rgba(246,95,231,0.12)', 'rgba(246,95,231,0.02)'],
+  gradientUnread: ['rgba(246,95,231,0.22)', 'rgba(246,95,231,0.04)'],
+  iconBg: 'rgba(246,95,231,0.18)',
+  iconColor: '#F65FE7',
+  border: 'rgba(246,95,231,0.2)',
+};
+const GREEN: Tint = {
+  gradient: ['rgba(159,250,127,0.18)', 'rgba(159,250,127,0.03)'],
+  gradientUnread: ['rgba(159,250,127,0.32)', 'rgba(159,250,127,0.06)'],
+  iconBg: 'rgba(159,250,127,0.28)',
+  iconColor: '#3F9F52',
+  border: 'rgba(63,159,82,0.24)',
+};
+const NEUTRAL: Tint = {
+  gradient: ['rgba(90,93,120,0.08)', 'rgba(90,93,120,0.02)'],
+  gradientUnread: ['rgba(90,93,120,0.14)', 'rgba(90,93,120,0.03)'],
+  iconBg: 'rgba(90,93,120,0.14)',
+  iconColor: '#5A5D78',
+  border: 'rgba(90,93,120,0.16)',
+};
+const DESTRUCTIVE: Tint = {
+  gradient: ['rgba(228,72,72,0.14)', 'rgba(228,72,72,0.02)'],
+  gradientUnread: ['rgba(228,72,72,0.24)', 'rgba(228,72,72,0.04)'],
+  iconBg: 'rgba(228,72,72,0.18)',
+  iconColor: '#D93838',
+  border: 'rgba(228,72,72,0.2)',
+};
+
+const tintMap: Record<string, Tint> = {
+  raffle_won: GREEN,
+  comment: BLUE,
+  reply: BLUE,
+  raffle_completed: NEUTRAL,
+  reroll: PINK,
+  chat_message: BLUE,
+  moderation: DESTRUCTIVE,
+  daily_update: BLUE,
+  pickup_confirm: GREEN,
 };
 
 export default function NotificationsScreen() {
@@ -105,41 +152,55 @@ export default function NotificationsScreen() {
           <FlatList
             data={notifications}
             keyExtractor={(item: any) => item.id}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 20, gap: 10 }}
             renderItem={({ item }) => {
               const Icon = iconMap[item.type] || Bell;
-              const colors = colorMap[item.type] || {
-                bg: 'bg-secondary',
-                iconColor: 'hsl(232 15% 55%)',
-              };
+              const tint = tintMap[item.type] || NEUTRAL;
+              const gradient = item.is_read ? tint.gradient : tint.gradientUnread;
               return (
                 <Pressable
                   onPress={() => handleClick(item)}
-                  className={`flex-row items-start gap-3 px-4 py-4 border-b border-border ${
-                    !item.is_read ? 'bg-primary/5' : ''
-                  }`}>
-                  <View
-                    className={`w-10 h-10 rounded-full items-center justify-center ${colors.bg}`}>
-                    <Icon size={20} color={colors.iconColor} />
-                  </View>
-                  <View className="flex-1">
-                    <View className="flex-row items-center justify-between">
-                      <Text className="font-poppins-700 text-foreground text-sm" numberOfLines={1}>
-                        {item.title}
-                      </Text>
-                      {!item.is_read && (
-                        <View className="w-2 h-2 rounded-full bg-droppi-pink" />
-                      )}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: tint.border,
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                  }}>
+                  <LinearGradient
+                    colors={gradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: 12,
+                      padding: 14,
+                    }}>
+                    <View
+                      className="w-10 h-10 rounded-full items-center justify-center"
+                      style={{ backgroundColor: tint.iconBg }}>
+                      <Icon size={20} color={tint.iconColor} />
                     </View>
-                    <Text className="text-sm text-muted-foreground mt-0.5">
-                      {item.body}
-                    </Text>
-                    <Text className="text-xs text-muted-foreground mt-1">
-                      {formatDistanceToNow(new Date(item.created_at), {
-                        addSuffix: true,
-                        locale: nl,
-                      })}
-                    </Text>
-                  </View>
+                    <View className="flex-1">
+                      <View className="flex-row items-center justify-between">
+                        <Text className="font-poppins-700 text-foreground text-sm flex-1" numberOfLines={1}>
+                          {item.title}
+                        </Text>
+                        {!item.is_read && (
+                          <View className="w-2 h-2 rounded-full bg-droppi-pink ml-2" />
+                        )}
+                      </View>
+                      <Text className="text-sm text-muted-foreground mt-0.5">
+                        {item.body}
+                      </Text>
+                      <Text className="text-xs text-muted-foreground mt-1">
+                        {formatDistanceToNow(new Date(item.created_at), {
+                          addSuffix: true,
+                          locale: nl,
+                        })}
+                      </Text>
+                    </View>
+                  </LinearGradient>
                 </Pressable>
               );
             }}

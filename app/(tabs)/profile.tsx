@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import {
   ChevronRight,
   Edit3,
@@ -29,6 +30,23 @@ const statusLabels: Record<string, string> = {
 };
 
 type Tab = 'given' | 'won' | 'liked';
+
+// Tint per profile-tab: given=blauw (jouw acties), won=groen (succes),
+// liked=roze (favorieten). Matcht met glassmorphism-patroon elders.
+const tabTintMap: Record<Tab, { gradient: [string, string]; border: string }> = {
+  given: {
+    gradient: ['rgba(104,128,255,0.14)', 'rgba(104,128,255,0.02)'],
+    border: 'rgba(104,128,255,0.2)',
+  },
+  won: {
+    gradient: ['rgba(159,250,127,0.2)', 'rgba(159,250,127,0.04)'],
+    border: 'rgba(63,159,82,0.24)',
+  },
+  liked: {
+    gradient: ['rgba(246,95,231,0.14)', 'rgba(246,95,231,0.02)'],
+    border: 'rgba(246,95,231,0.22)',
+  },
+};
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -138,36 +156,55 @@ export default function ProfileScreen() {
                 </Text>
               </View>
             )}
-            {(activePosts || []).map((post: any) => (
-              <Pressable
-                key={post.id}
-                onPress={() => router.push(`/post/${post.id}`)}
-                className="flex-row items-center gap-3 px-3 py-3 bg-card rounded-2xl">
-                <View className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
-                  {post.images?.[0] ? (
-                    <Image source={{ uri: post.images[0].image_url }} className="w-full h-full" />
-                  ) : (
-                    <View className="w-full h-full items-center justify-center">
-                      <Text className="text-muted-foreground text-xs">Geen foto</Text>
+            {(activePosts || []).map((post: any) => {
+              const tint = tabTintMap[tab];
+              return (
+                <Pressable
+                  key={post.id}
+                  onPress={() => router.push(`/post/${post.id}`)}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: tint.border,
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                  }}>
+                  <LinearGradient
+                    colors={tint.gradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: 12,
+                    }}>
+                    <View className="w-14 h-14 rounded-xl overflow-hidden bg-muted">
+                      {post.images?.[0] ? (
+                        <Image source={{ uri: post.images[0].image_url }} className="w-full h-full" />
+                      ) : (
+                        <View className="w-full h-full items-center justify-center">
+                          <Text className="text-muted-foreground text-xs">Geen foto</Text>
+                        </View>
+                      )}
                     </View>
-                  )}
-                </View>
-                <View className="flex-1">
-                  <Text className="font-poppins-700 text-foreground text-sm" numberOfLines={1}>
-                    {post.title}
-                  </Text>
-                  <Text
-                    className={`text-xs font-poppins-600 ${
-                      post.status === 'active' || post.status === 'ending'
-                        ? 'text-primary'
-                        : 'text-muted-foreground'
-                    }`}>
-                    {statusLabels[post.status] || post.status}
-                  </Text>
-                </View>
-                <ChevronRight size={20} color="hsl(232 15% 55%)" />
-              </Pressable>
-            ))}
+                    <View className="flex-1">
+                      <Text className="font-poppins-700 text-foreground text-sm" numberOfLines={1}>
+                        {post.title}
+                      </Text>
+                      <Text
+                        className={`text-xs font-poppins-600 ${
+                          post.status === 'active' || post.status === 'ending'
+                            ? 'text-primary'
+                            : 'text-muted-foreground'
+                        }`}>
+                        {statusLabels[post.status] || post.status}
+                      </Text>
+                    </View>
+                    <ChevronRight size={20} color="hsl(232 15% 55%)" />
+                  </LinearGradient>
+                </Pressable>
+              );
+            })}
           </View>
 
           <View className="px-4 gap-2 pb-8">
