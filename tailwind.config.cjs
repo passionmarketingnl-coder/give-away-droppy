@@ -73,16 +73,17 @@ module.exports = {
         // Body default (Poppins). Weights beschikbaar via expliciete family
         // (bijv. font-poppins-600) omdat RN fonts per weight geladen worden.
         sans: ["Poppins_400Regular", "system-ui", "sans-serif"],
-        // Headings (Yanone Kaffeesatz).
-        heading: ["YanoneKaffeesatz_700Bold", "system-ui", "sans-serif"],
+        // Headings: Fredoka. Rondere, gevulde vormen die matchen met het
+        // nieuwe 'droppi' bubbel-wordmark. (Vervangt Yanone Kaffeesatz.)
+        heading: ["Fredoka_700Bold", "system-ui", "sans-serif"],
         // Expliciete weights waar nodig:
         "poppins-400": ["Poppins_400Regular"],
         "poppins-500": ["Poppins_500Medium"],
         "poppins-600": ["Poppins_600SemiBold"],
         "poppins-700": ["Poppins_700Bold"],
-        "yanone-500": ["YanoneKaffeesatz_500Medium"],
-        "yanone-600": ["YanoneKaffeesatz_600SemiBold"],
-        "yanone-700": ["YanoneKaffeesatz_700Bold"],
+        "fredoka-500": ["Fredoka_500Medium"],
+        "fredoka-600": ["Fredoka_600SemiBold"],
+        "fredoka-700": ["Fredoka_700Bold"],
       },
     },
   },

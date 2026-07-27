@@ -12,6 +12,7 @@
     "lint": "expo lint"
   },
   "dependencies": {
+    "@expo-google-fonts/fredoka": "^0.4.1",
     "@expo-google-fonts/poppins": "^0.4.1",
     "@expo-google-fonts/yanone-kaffeesatz": "^0.4.3",
     "@expo/vector-icons": "^15.0.3",

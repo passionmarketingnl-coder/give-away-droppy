@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { PortalHost } from '@rn-primitives/portal';
-import { useFonts as useYanone, YanoneKaffeesatz_500Medium, YanoneKaffeesatz_600SemiBold, YanoneKaffeesatz_700Bold } from '@expo-google-fonts/yanone-kaffeesatz';
+import { useFonts as useFredoka, Fredoka_500Medium, Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { useFonts as usePoppins, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { View } from 'react-native';
 import 'react-native-reanimated';
@@ -42,10 +42,10 @@ function AppShell() {
 }
 
 export default function RootLayout() {
-  const [yanoneLoaded] = useYanone({
-    YanoneKaffeesatz_500Medium,
-    YanoneKaffeesatz_600SemiBold,
-    YanoneKaffeesatz_700Bold,
+  const [fredokaLoaded] = useFredoka({
+    Fredoka_500Medium,
+    Fredoka_600SemiBold,
+    Fredoka_700Bold,
   });
   const [poppinsLoaded] = usePoppins({
     Poppins_400Regular,
@@ -54,7 +54,7 @@ export default function RootLayout() {
     Poppins_700Bold,
   });
 
-  if (!yanoneLoaded || !poppinsLoaded) {
+  if (!fredokaLoaded || !poppinsLoaded) {
     return <View className="flex-1 bg-background" />;
   }
 
