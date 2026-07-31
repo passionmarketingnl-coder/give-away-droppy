@@ -141,12 +141,19 @@ Deno.serve(async (req) => {
         post_id: post.id,
       });
 
-      // Notify poster
+      // Notify poster — gepersonaliseerd met de naam van de winnaar (briefing P2)
+      const { data: winnerProfile } = await supabase
+        .from("profiles")
+        .select("first_name")
+        .eq("id", winner.user_id)
+        .single();
+      const winnerName = winnerProfile?.first_name || "Iemand";
+
       await supabase.from("notifications").insert({
         user_id: post.user_id,
         type: "raffle_completed",
-        title: "Loting afgerond 🎲",
-        body: `De loting van ${post.title} is afgerond!`,
+        title: "Je item is verloot! 🎲",
+        body: `${winnerName} heeft ${post.title} gewonnen! Neem contact op om de ophaling te regelen.`,
         post_id: post.id,
       });
 

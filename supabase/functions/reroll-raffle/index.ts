@@ -75,6 +75,35 @@ Deno.serve(async (req) => {
       );
     }
 
+    // 48-uurs gate (briefing P2): herverloten kan pas als de winnaar 48 uur
+    // de tijd heeft gehad om te reageren. Voorkomt ook misbruik waarbij een
+    // poster blijft herverloten tot een gewenste winnaar uitrolt.
+    const { data: lastRaffleTime } = await supabase
+      .from("raffles")
+      .select("created_at")
+      .eq("post_id", post_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (lastRaffleTime) {
+      const elapsedMs = Date.now() - new Date(lastRaffleTime.created_at).getTime();
+      const gateMs = 48 * 60 * 60 * 1000;
+      if (elapsedMs < gateMs) {
+        const hoursLeft = Math.ceil((gateMs - elapsedMs) / (60 * 60 * 1000));
+        // 200 met result-veld: supabase-js geeft bij non-2xx alleen een
+        // generieke foutmelding, zo kan de client de echte reden tonen.
+        return new Response(
+          JSON.stringify({
+            result: "too_early",
+            message: `Herverloten kan 48 uur na de loting, zodat de winnaar tijd heeft om te reageren. Nog ${hoursLeft} uur te gaan.`,
+            hours_left: hoursLeft,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // Get all previous winners to exclude
     const { data: previousRaffles } = await supabase
       .from("raffles")

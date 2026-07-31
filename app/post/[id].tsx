@@ -366,6 +366,7 @@ export default function PostDetailScreen() {
                       <Text>
                         Reageerde de winnaar niet? Er wordt een nieuwe winnaar gekozen
                         uit de overige deelnemers. De vorige winnaar wordt uitgesloten.
+                        Herverloten kan vanaf 48 uur na de loting.
                       </Text>
                     </AlertDialogDescription>
                   </AlertDialogHeader>

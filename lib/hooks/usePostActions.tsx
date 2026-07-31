@@ -37,6 +37,11 @@ export const useReroll = () => {
         body: { post_id: postId },
       });
       if (error) throw new Error(error.message || "Herverloting mislukt");
+      // Server geeft 200 + result-veld terug zodat de echte reden zichtbaar
+      // is (bij non-2xx geeft supabase-js alleen een generieke melding).
+      if (data?.result === "too_early") {
+        throw new Error(data.message || "Herverloten kan nog niet.");
+      }
       return data;
     },
     onSuccess: () => {
