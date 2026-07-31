@@ -4,10 +4,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Bell, Home, MessageCircle, Plus, User } from 'lucide-react-native';
 
 import { useAuth } from '@/lib/hooks/useAuth';
+import { useEnsureLocation } from '@/lib/hooks/useEnsureLocation';
 
 export default function TabsLayout() {
   const { user, loading } = useAuth();
   const insets = useSafeAreaInsets();
+
+  // Vangnet: geocodeer alsnog als registratie via e-mailverificatie liep
+  // (geen sessie tijdens signup → geocode-address nooit aangeroepen).
+  useEnsureLocation();
 
   if (loading) return <View className="flex-1 bg-background" />;
   if (!user) return <Redirect href="/auth" />;
