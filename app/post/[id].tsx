@@ -4,7 +4,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  Share,
   View,
 } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
@@ -26,6 +25,7 @@ import {
 
 import CommentsSection from '@/components/post/CommentsSection';
 import ReportDialog from '@/components/post/ReportDialog';
+import { sharePost } from '@/lib/share';
 import StatusBadge from '@/components/feed/StatusBadge';
 import {
   AlertDialog,
@@ -100,14 +100,9 @@ export default function PostDetailScreen() {
   };
 
   const handleShare = async () => {
-    try {
-      await Share.share({
-        title: post.title,
-        message: `Bekijk "${post.title}" op Droppi!`,
-        url: `https://droppi.app/post/${post.id}`,
-      });
-    } catch {
-      // user cancelled or unsupported
+    const result = await sharePost({ id: post.id, title: post.title });
+    if (result === 'copied') {
+      showToast('success', 'Link gekopieerd! 📋');
     }
   };
 

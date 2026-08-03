@@ -1,12 +1,13 @@
 import { useRef, useState } from 'react';
-import { Image, Platform, Pressable, Share, View } from 'react-native';
+import { Image, Platform, Pressable, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Clock, Flame, Heart, MapPin, Share2 } from 'lucide-react-native';
+import { Check, Clock, Flame, Heart, MapPin, Share2 } from 'lucide-react-native';
 
 import StatusBadge, { type StatusType } from './StatusBadge';
 import { Text } from '@/components/ui/text';
 import { useToggleLike } from '@/lib/hooks/usePosts';
+import { sharePost } from '@/lib/share';
 
 export interface PostCardData {
   id: string;
@@ -91,6 +92,7 @@ export default function PostCard({ post }: PostCardProps) {
   const toggleLike = useToggleLike();
   const lastTapRef = useRef(0);
   const [showHeartAnim, setShowHeartAnim] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
 
   const isDummy = post.id.startsWith('demo-');
   const hasImage = !!post.imageUrl;
@@ -118,14 +120,11 @@ export default function PostCard({ post }: PostCardProps) {
   };
 
   const handleShare = async () => {
-    try {
-      await Share.share({
-        message: `${post.title} — bekijk op Droppi`,
-        url: `https://droppi.app/post/${post.id}`,
-        title: post.title,
-      });
-    } catch (e) {
-      // user cancelled or platform niet ondersteund
+    const result = await sharePost({ id: post.id, title: post.title });
+    if (result === 'copied') {
+      // Korte visuele feedback: share-icoon wordt even een vinkje.
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
     }
   };
 
@@ -181,7 +180,11 @@ export default function PostCard({ post }: PostCardProps) {
         <Pressable
           onPress={handleShare}
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 items-center justify-center">
-          <Share2 size={16} color="#16183A" />
+          {showCopied ? (
+            <Check size={16} color="#3F9F52" strokeWidth={3} />
+          ) : (
+            <Share2 size={16} color="#16183A" />
+          )}
         </Pressable>
         {post.images.length > 1 && (
           <View className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90">
