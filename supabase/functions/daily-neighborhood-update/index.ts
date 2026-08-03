@@ -41,6 +41,43 @@ Deno.serve(async (req) => {
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
 
+    // === Gespreid versturen in avond-slots ===
+    // De cron vuurt elke 15 min tussen 16:00-18:45 UTC (18:00-20:45 NL in
+    // de zomer). Elke gebruiker hangt via een hash van z'n id vast aan één
+    // van de 12 slots, zodat niet iedereen tegelijk een push krijgt en
+    // ieder dagelijks rond hetzelfde eigen moment de update ontvangt.
+    const SLOT_COUNT = 12;
+    const WINDOW_START_UTC_MIN = 16 * 60; // 16:00 UTC
+    const minutesUtc = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const currentSlot = Math.floor((minutesUtc - WINDOW_START_UTC_MIN) / 15);
+
+    let body: { slot?: number; force?: boolean } = {};
+    try {
+      body = await req.json();
+    } catch {
+      // lege body is prima (cron stuurt {})
+    }
+
+    // Handmatige override voor testen: {slot: n} of {force: true} (= alle slots).
+    const activeSlot = body.slot ?? currentSlot;
+    const allSlots = body.force === true;
+
+    if (!allSlots && (activeSlot < 0 || activeSlot >= SLOT_COUNT)) {
+      return new Response(
+        JSON.stringify({ message: "Outside send window, nothing to do", slot: activeSlot }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Deterministische slot-toewijzing per gebruiker.
+    function slotForUserId(id: string): number {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+      }
+      return hash % SLOT_COUNT;
+    }
+
     // Get all posts created today that are active
     const { data: todayPosts, error: postsError } = await supabase
       .from("posts")
@@ -83,16 +120,10 @@ Deno.serve(async (req) => {
     for (const profile of profiles || []) {
       if (!profile.latitude || !profile.longitude) continue;
 
-      // Check if user already got a daily_update today
-      const { data: existing } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile.id)
-        .eq("type", "daily_update")
-        .gte("created_at", todayStart.toISOString());
+      // Alleen gebruikers van het huidige kwartier-slot (tenzij force).
+      if (!allSlots && slotForUserId(profile.id) !== activeSlot) continue;
 
-      if (existing && (existing as any).length > 0) continue;
-      // Use count check instead
+      // Max één daily_update per gebruiker per dag.
       const { count: existingCount } = await supabase
         .from("notifications")
         .select("*", { count: "exact", head: true })
@@ -122,7 +153,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ sent: notificationCount }),
+      JSON.stringify({ sent: notificationCount, slot: allSlots ? "all" : activeSlot }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
