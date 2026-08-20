@@ -10,15 +10,17 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bpecom.droppi"
+      "bundleIdentifier": "com.bpecom.droppi",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Droppi gebruikt je fotobibliotheek zodat je foto's kunt toevoegen aan producten die je weggeeft en aan je profielfoto.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.bpecom.droppi",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
@@ -29,6 +31,14 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Droppi gebruikt je fotobibliotheek zodat je foto's kunt toevoegen aan producten die je weggeeft en aan je profielfoto.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       [
         "expo-splash-screen",
         {

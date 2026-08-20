@@ -18,14 +18,22 @@ export const useComments = (postId: string) => {
   return useQuery({
     queryKey: ["comments", postId],
     queryFn: async (): Promise<Comment[]> => {
-      const { data, error } = await supabase
+      const { data: rawComments, error } = await supabase
         .from("comments")
         .select("*")
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
-      if (!data || data.length === 0) return [];
+
+      // Comments van geblokkeerde gebruikers verbergen (UGC-vereiste).
+      const { data: blocks } = await supabase
+        .from("blocked_users")
+        .select("blocked_user_id");
+      const blockedIds = new Set((blocks || []).map((b: any) => b.blocked_user_id));
+      const data = (rawComments || []).filter((c) => !blockedIds.has(c.user_id));
+
+      if (data.length === 0) return [];
 
       const userIds = [...new Set(data.map((c) => c.user_id))];
       const { data: profiles } = await supabase.rpc("get_public_profiles", { user_ids: userIds });

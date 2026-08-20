@@ -54,14 +54,25 @@ export const useConversations = () => {
     queryFn: async (): Promise<Conversation[]> => {
       if (!user) return [];
 
-      const { data: convos, error } = await supabase
+      const { data: rawConvos, error } = await supabase
         .from("conversations")
         .select("*")
         .or(`poster_user_id.eq.${user.id},winner_user_id.eq.${user.id}`)
         .order("updated_at", { ascending: false });
 
       if (error) throw error;
-      if (!convos || convos.length === 0) return [];
+
+      // Gesprekken met geblokkeerde gebruikers verbergen (UGC-vereiste).
+      const { data: blocks } = await supabase
+        .from("blocked_users")
+        .select("blocked_user_id");
+      const blockedIds = new Set((blocks || []).map((b: any) => b.blocked_user_id));
+      const convos = (rawConvos || []).filter((c) => {
+        const otherId = c.poster_user_id === user.id ? c.winner_user_id : c.poster_user_id;
+        return !blockedIds.has(otherId);
+      });
+
+      if (convos.length === 0) return [];
 
       const postIds = [...new Set(convos.map((c) => c.post_id))];
       const { data: posts } = await supabase

@@ -44,14 +44,22 @@ export const usePosts = () => {
         userLng = profile?.longitude ?? null;
       }
 
-      const { data: posts, error } = await supabase.rpc("get_feed_posts", {
+      const { data: rawPosts, error } = await supabase.rpc("get_feed_posts", {
         p_user_lat: userLat ?? undefined,
         p_user_lng: userLng ?? undefined,
         p_radius_km: 7,
       });
 
       if (error) throw error;
-      if (!posts || posts.length === 0) return [];
+
+      // Posts van geblokkeerde gebruikers wegfilteren (UGC-vereiste).
+      const { data: blocks } = await supabase
+        .from("blocked_users")
+        .select("blocked_user_id");
+      const blockedIds = new Set((blocks || []).map((b: any) => b.blocked_user_id));
+      const posts = (rawPosts || []).filter((p: any) => !blockedIds.has(p.user_id));
+
+      if (posts.length === 0) return [];
 
       const postIds = posts.map((p: any) => p.id);
       const { data: allImages } = await supabase

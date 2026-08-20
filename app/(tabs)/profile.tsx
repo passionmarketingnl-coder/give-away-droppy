@@ -11,14 +11,27 @@ import {
   LogOut,
   Package,
   Shield,
+  Trash2,
   Trophy,
 } from 'lucide-react-native';
 
 import PrivacySheet from '@/components/legal/PrivacySheet';
 import TermsSheet from '@/components/legal/TermsSheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useLikedPosts, useMyPosts, useWonPosts } from '@/lib/hooks/useProfile';
+import { supabase } from '@/lib/supabase/client';
 
 const statusLabels: Record<string, string> = {
   active: 'Actief',
@@ -57,6 +70,23 @@ export default function ProfileScreen() {
   const [tab, setTab] = useState<Tab>('given');
   const [termsOpen, setTermsOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  // Store-vereiste (Apple 5.1.1(v) / Google account deletion policy):
+  // in-app accountverwijdering. Edge function wist storage + alle data.
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('delete-account');
+      if (error || data?.error) {
+        throw new Error(data?.error || 'Verwijderen mislukt');
+      }
+      // Sessie is ongeldig na verwijdering; signOut ruimt lokale state op.
+      await signOut();
+    } catch {
+      setDeleting(false);
+    }
+  };
 
   const firstName = (user?.user_metadata as any)?.first_name || '';
   const lastName = (user?.user_metadata as any)?.last_name || '';
@@ -285,6 +315,65 @@ export default function ProfileScreen() {
                 </LinearGradient>
               </Pressable>
             ))}
+
+            {/* Account verwijderen — verplicht in-app aanwezig voor App Store
+                (5.1.1(v)) en Google Play (account deletion policy). */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Pressable
+                  disabled={deleting}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: 'rgba(228,72,72,0.3)',
+                    borderRadius: 20,
+                    overflow: 'hidden',
+                    opacity: deleting ? 0.6 : 1,
+                  }}>
+                  <LinearGradient
+                    colors={['rgba(228,72,72,0.16)', 'rgba(228,72,72,0.04)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 12,
+                      paddingHorizontal: 16,
+                      paddingVertical: 14,
+                    }}>
+                    {deleting ? (
+                      <Loader2 size={20} color="#D93838" />
+                    ) : (
+                      <Trash2 size={20} color="#D93838" />
+                    )}
+                    <Text className="flex-1 font-poppins-600 text-destructive">
+                      Account verwijderen
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    <Text>Account permanent verwijderen?</Text>
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <Text>
+                      Dit verwijdert je account, al je posts, foto&apos;s, chats,
+                      deelnames en meldingen definitief. Dit kan niet ongedaan
+                      worden gemaakt.
+                    </Text>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    <Text>Annuleren</Text>
+                  </AlertDialogCancel>
+                  <AlertDialogAction onPress={handleDeleteAccount}>
+                    <Text>Definitief verwijderen</Text>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </View>
         </View>
       </ScrollView>

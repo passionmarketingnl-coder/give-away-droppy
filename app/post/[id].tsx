@@ -21,6 +21,7 @@ import {
   RefreshCw,
   Share2,
   Trophy,
+  UserX,
 } from 'lucide-react-native';
 
 import CommentsSection from '@/components/post/CommentsSection';
@@ -42,6 +43,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { useConversations } from '@/lib/hooks/useChats';
+import { useBlockUser } from '@/lib/hooks/useBlocks';
 import { useConfirmPickup, useReroll } from '@/lib/hooks/usePostActions';
 import { usePost, useToggleLike } from '@/lib/hooks/usePosts';
 
@@ -54,6 +56,7 @@ export default function PostDetailScreen() {
   const toggleLike = useToggleLike();
   const confirmPickup = useConfirmPickup();
   const reroll = useReroll();
+  const blockUser = useBlockUser();
   const [currentImage, setCurrentImage] = useState(0);
   const [toast, setToast] = useState<{ kind: 'success' | 'error'; msg: string } | null>(null);
 
@@ -116,6 +119,16 @@ export default function PostDetailScreen() {
   const handleReroll = () => {
     reroll.mutate(post.id, {
       onSuccess: () => showToast('success', 'Nieuwe winnaar gekozen!'),
+      onError: (e) => showToast('error', e.message),
+    });
+  };
+
+  const handleBlockUser = () => {
+    blockUser.mutate(post.user_id, {
+      onSuccess: () => {
+        showToast('success', 'Gebruiker geblokkeerd');
+        setTimeout(() => router.back(), 900);
+      },
       onError: (e) => showToast('error', e.message),
     });
   };
@@ -424,6 +437,42 @@ export default function PostDetailScreen() {
 
           <CommentsSection postId={post.id} />
           <ReportDialog postId={post.id} />
+
+          {/* Blokkeren (App Store 1.2 UGC-vereiste), alleen bij andermans post */}
+          {!isPoster && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Pressable className="flex-row items-center gap-2">
+                  <UserX size={16} color="hsl(232 15% 55%)" />
+                  <Text className="text-sm text-muted-foreground">
+                    Blokkeer deze gebruiker
+                  </Text>
+                </Pressable>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    <Text>Gebruiker blokkeren?</Text>
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <Text>
+                      Je ziet dan geen posts, reacties of berichten meer van{' '}
+                      {posterName}. Blokkeren kan niet via de app ongedaan
+                      worden gemaakt.
+                    </Text>
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    <Text>Annuleren</Text>
+                  </AlertDialogCancel>
+                  <AlertDialogAction onPress={handleBlockUser}>
+                    <Text>Blokkeren</Text>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </View>
       </ScrollView>
 
