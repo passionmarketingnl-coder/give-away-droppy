@@ -42,14 +42,25 @@ Deno.serve(async (req) => {
     todayStart.setHours(0, 0, 0, 0);
 
     // === Gespreid versturen in avond-slots ===
-    // De cron vuurt elke 15 min tussen 16:00-18:45 UTC (18:00-20:45 NL in
-    // de zomer). Elke gebruiker hangt via een hash van z'n id vast aan één
-    // van de 12 slots, zodat niet iedereen tegelijk een push krijgt en
-    // ieder dagelijks rond hetzelfde eigen moment de update ontvangt.
+    // Venster: 18:00-20:45 NEDERLANDSE tijd, zomer én winter. De cron
+    // vuurt ruim (16:00-19:45 UTC) zodat beide seizoenen gedekt zijn; hier
+    // rekenen we om naar Europe/Amsterdam en no-op'en we buiten het
+    // NL-venster. Elke gebruiker hangt via een hash van z'n id vast aan
+    // één van de 12 kwartier-slots, zodat niet iedereen tegelijk een push
+    // krijgt en ieder dagelijks rond hetzelfde eigen moment de update
+    // ontvangt.
     const SLOT_COUNT = 12;
-    const WINDOW_START_UTC_MIN = 16 * 60; // 16:00 UTC
-    const minutesUtc = now.getUTCHours() * 60 + now.getUTCMinutes();
-    const currentSlot = Math.floor((minutesUtc - WINDOW_START_UTC_MIN) / 15);
+    const WINDOW_START_NL_MIN = 18 * 60; // 18:00 NL
+    const nlParts = new Intl.DateTimeFormat("nl-NL", {
+      timeZone: "Europe/Amsterdam",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(now);
+    const nlHour = Number(nlParts.find((p) => p.type === "hour")?.value ?? "0");
+    const nlMinute = Number(nlParts.find((p) => p.type === "minute")?.value ?? "0");
+    const minutesNl = nlHour * 60 + nlMinute;
+    const currentSlot = Math.floor((minutesNl - WINDOW_START_NL_MIN) / 15);
 
     let body: { slot?: number; force?: boolean } = {};
     try {
