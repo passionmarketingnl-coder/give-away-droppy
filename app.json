@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.bpecom.droppi",
+      "usesAppleSignIn": true,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Droppi gebruikt je fotobibliotheek zodat je foto's kunt toevoegen aan producten die je weggeeft en aan je profielfoto.",
         "ITSAppUsesNonExemptEncryption": false
@@ -58,7 +59,9 @@
           "color": "#3B82F6",
           "defaultChannel": "default"
         }
-      ]
+      ],
+      "expo-web-browser",
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
+import { signInWithApple, signInWithGoogle } from '@/lib/auth/oauth';
 import { supabase } from '@/lib/supabase/client';
 
 type Step = 'welcome' | 'login' | 'register' | 'verify' | 'forgot' | 'forgot-sent';
@@ -38,6 +39,7 @@ export default function AuthScreen() {
   const [postcode, setPostcode] = useState('');
   const [houseNumber, setHouseNumber] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<'google' | 'apple' | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -109,11 +111,18 @@ export default function AuthScreen() {
     setLoading(false);
   };
 
-  const showOAuthSoon = () => {
+  const handleOAuth = async (provider: 'google' | 'apple') => {
     clearMessages();
-    setInfoMsg(
-      'Google en Apple sign-in komen in een volgende update. Gebruik voor nu e-mail en wachtwoord.'
-    );
+    setOauthLoading(provider);
+    const result =
+      provider === 'google' ? await signInWithGoogle() : await signInWithApple();
+    setOauthLoading(null);
+    if (!result.ok && !result.cancelled) {
+      setErrorMsg(result.error || 'Inloggen mislukt. Probeer het opnieuw.');
+    }
+    // Bij succes triggert onAuthStateChange de redirect; OAuth-gebruikers
+    // zonder postcode/consent worden door (tabs)/_layout naar
+    // /complete-profile gestuurd.
   };
 
   const handleForgotPassword = async () => {
@@ -313,20 +322,27 @@ export default function AuthScreen() {
               <View className="flex-row gap-3 mt-4">
                 <Button
                   variant="outline"
-                  onPress={showOAuthSoon}
+                  onPress={() => handleOAuth('google')}
+                  disabled={oauthLoading !== null}
                   className="flex-1 h-14 rounded-full bg-white/10 border-white/20">
-                  <Text className="text-white">Google</Text>
+                  {oauthLoading === 'google' ? (
+                    <Loader2 size={18} color="white" />
+                  ) : (
+                    <Text className="text-white">Google</Text>
+                  )}
                 </Button>
                 <Button
                   variant="outline"
-                  onPress={showOAuthSoon}
+                  onPress={() => handleOAuth('apple')}
+                  disabled={oauthLoading !== null}
                   className="flex-1 h-14 rounded-full bg-white/10 border-white/20">
-                  <Text className="text-white">Apple</Text>
+                  {oauthLoading === 'apple' ? (
+                    <Loader2 size={18} color="white" />
+                  ) : (
+                    <Text className="text-white">Apple</Text>
+                  )}
                 </Button>
               </View>
-              <Text className="text-xs text-white/60 text-center mt-2">
-                Google/Apple: binnenkort beschikbaar
-              </Text>
             </View>
           )}
 

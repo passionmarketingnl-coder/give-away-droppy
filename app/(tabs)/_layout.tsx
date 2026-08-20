@@ -17,6 +17,12 @@ export default function TabsLayout() {
   if (loading) return <View className="flex-1 bg-background" />;
   if (!user) return <Redirect href="/auth" />;
 
+  // OAuth-gebruikers (Google/Apple) slaan de registratie over en missen
+  // postcode/consent; eerst profiel afmaken voordat de app opent.
+  if (!(user.user_metadata as any)?.postcode) {
+    return <Redirect href="/complete-profile" />;
+  }
+
   // Op iOS/Android voegen we bottom safe-area toe zodat labels niet
   // achter de home-indicator vallen. Op web is insets.bottom = 0 → 12px
   // padding om labels vrij te laten ademen.
