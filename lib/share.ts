@@ -8,15 +8,15 @@ export type ShareResult = 'shared' | 'copied' | 'failed';
  * briefing-fallback: link naar het klembord ('copied' → toon zelf een
  * "Link gekopieerd!" melding).
  *
- * Op web gebruiken we window.location.origin zolang droppi.app nog niet
- * geregistreerd is; native houdt de droppi.app URL als placeholder tot
- * deep linking is opgezet.
+ * Op web gebruiken we window.location.origin; native gebruikt het
+ * geregistreerde domein getdroppi.com (deep linking volgt zodra de
+ * web-app daar live staat).
  */
 export async function sharePost(post: { id: string; title: string }): Promise<ShareResult> {
   const url =
     Platform.OS === 'web' && typeof window !== 'undefined'
       ? `${window.location.origin}/post/${post.id}`
-      : `https://droppi.app/post/${post.id}`;
+      : `https://getdroppi.com/post/${post.id}`;
   const message = `Bekijk "${post.title}" op Droppi!`;
 
   if (Platform.OS === 'web') {

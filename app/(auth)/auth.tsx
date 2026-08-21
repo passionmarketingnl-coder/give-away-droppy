@@ -137,7 +137,7 @@ export default function AuthScreen() {
     const redirectTo =
       Platform.OS === 'web' && typeof window !== 'undefined'
         ? `${window.location.origin}/reset-password`
-        : 'https://droppi.app/reset-password';
+        : 'https://getdroppi.com/reset-password';
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo,
     });
