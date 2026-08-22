@@ -12,20 +12,41 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const providedSecret = req.headers.get("X-Cron-Secret");
+    if (!providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const now = new Date();
-    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
+    const { data: secretRow } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "cron_secret")
+      .single();
 
-    // === STEP 1: Check posts with 100+ likes that are at least 4 hours old ===
+    if (!secretRow || secretRow.value !== providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const now = new Date();
+    const minOnlineAgo = new Date(now.getTime() - 8 * 60 * 60 * 1000).toISOString();
+
+    // === STEP 1: Check posts with 100+ likes that are at least 8 hours old ===
     // These get raffled early (before the 24h timer)
     const { data: allActivePosts } = await supabase
       .from("posts")
       .select("id, user_id, title, created_at")
       .in("status", ["active", "ending"])
-      .lte("created_at", fourHoursAgo);
+      .lte("created_at", minOnlineAgo);
 
     for (const post of allActivePosts || []) {
       const { count } = await supabase
@@ -44,13 +65,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // === STEP 2: Raffle all posts where raffle_due_at <= now AND created >= 4h ago ===
+    // === STEP 2: Raffle all posts where raffle_due_at <= now AND created >= 8h ago ===
     const { data: duePosts, error: fetchError } = await supabase
       .from("posts")
       .select("id, user_id, title, created_at")
       .in("status", ["active", "ending"])
       .lte("raffle_due_at", now.toISOString())
-      .lte("created_at", fourHoursAgo);
+      .lte("created_at", minOnlineAgo);
 
     if (fetchError) throw fetchError;
 
@@ -120,12 +141,19 @@ Deno.serve(async (req) => {
         post_id: post.id,
       });
 
-      // Notify poster
+      // Notify poster — gepersonaliseerd met de naam van de winnaar (briefing P2)
+      const { data: winnerProfile } = await supabase
+        .from("profiles")
+        .select("first_name")
+        .eq("id", winner.user_id)
+        .single();
+      const winnerName = winnerProfile?.first_name || "Iemand";
+
       await supabase.from("notifications").insert({
         user_id: post.user_id,
         type: "raffle_completed",
-        title: "Loting afgerond 🎲",
-        body: `De loting van ${post.title} is afgerond!`,
+        title: "Je item is verloot! 🎲",
+        body: `${winnerName} heeft ${post.title} gewonnen! Neem contact op om de ophaling te regelen.`,
         post_id: post.id,
       });
 

@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Droppi Huisstijl 2.0 — kleuren als HSL (H S% L%) voor NativeWind hsl(var(--x))
+ *
+ * Droppi Blauw  #6880FF  → 231 100% 71%   (primary)
+ * Share Roze    #F65FE7  → 305 89% 67%    (accent)
+ * Buurt Groen   #9FFA7F  → 106 93% 74%    (success / secondary accent)
+ * Ink Navy      #16183A  → 238 45% 16%    (foreground on light bg)
+ * Mist Grijs    #F4F4F4  → 0 0% 96%       (background)
+ *
+ * Body tekst    #3A3D5C  → 232 22% 30%
+ * Muted tekst   #5A5D78  → 232 15% 41%
+ * Faint tekst   #8B8EA8  → 233 15% 60%
+ */
+
+@layer base {
+  :root {
+    --background: 0 0% 96%;
+    --foreground: 238 45% 16%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 238 45% 16%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 238 45% 16%;
+
+    --primary: 231 100% 71%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 231 100% 96%;
+    --secondary-foreground: 238 45% 16%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 232 15% 41%;
+
+    --accent: 305 89% 67%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 232 15% 90%;
+    --input: 232 15% 90%;
+    --ring: 231 100% 71%;
+
+    --radius: 1.25rem;
+
+    /* Brand tokens (Huisstijl 2.0) */
+    --droppi-blue: 231 100% 71%;
+    --droppi-pink: 305 89% 67%;
+    --droppi-green: 106 93% 74%;
+    --droppi-navy: 238 45% 16%;
+    --droppi-mist: 0 0% 96%;
+
+    /* Backwards-compat aliases voor bestaande code (StatusBadge, etc.)
+       zodat we niet elke class hoeven aan te passen. */
+    --droppy-blue: 231 100% 71%;
+    --droppy-blue-dark: 231 90% 60%;
+    --droppy-green: 106 93% 74%;
+    --droppy-light: 0 0% 96%;
+    --droppy-navy: 238 45% 16%;
+    --droppy-gold: 305 89% 67%;
+    --droppy-success: 106 93% 74%;
+  }
+
+  .dark:root {
+    --background: 238 45% 8%;
+    --foreground: 0 0% 96%;
+    --card: 238 40% 14%;
+    --card-foreground: 0 0% 96%;
+    --popover: 238 40% 14%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 231 100% 71%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 238 30% 20%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 238 30% 20%;
+    --muted-foreground: 233 15% 65%;
+    --accent: 305 89% 67%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 238 30% 22%;
+    --input: 238 30% 22%;
+    --ring: 231 100% 71%;
+  }
+}

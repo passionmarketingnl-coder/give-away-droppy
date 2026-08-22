@@ -12,9 +12,30 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const providedSecret = req.headers.get("X-Cron-Secret");
+    if (!providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: secretRow } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "cron_secret")
+      .single();
+
+    if (!secretRow || secretRow.value !== providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const now = new Date();
     const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();

@@ -83,16 +83,23 @@ Deno.serve(async (req) => {
       .eq("post_id", post_id)
       .eq("poster_user_id", user.id);
 
-    // Notify winner that pickup is confirmed
+    // Notify both users that pickup is confirmed (briefing P2)
     if (post.winner_user_id) {
       await supabase.from("notifications").insert({
         user_id: post.winner_user_id,
-        type: "raffle_completed",
+        type: "pickup_confirm",
         title: "Ophaling bevestigd ✅",
-        body: `"${post.title}" is succesvol opgehaald. Bedankt!`,
+        body: `"${post.title}" is succesvol opgehaald. Veel plezier ermee!`,
         post_id: post_id,
       });
     }
+    await supabase.from("notifications").insert({
+      user_id: post.user_id,
+      type: "pickup_confirm",
+      title: "Ophaling bevestigd ✅",
+      body: `"${post.title}" is gemarkeerd als opgehaald. Bedankt voor het delen!`,
+      post_id: post_id,
+    });
 
     return new Response(
       JSON.stringify({ result: "confirmed", post_id }),

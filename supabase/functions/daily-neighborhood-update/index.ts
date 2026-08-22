@@ -12,13 +12,82 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const providedSecret = req.headers.get("X-Cron-Secret");
+    if (!providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
+    const { data: secretRow } = await supabase
+      .from("app_config")
+      .select("value")
+      .eq("key", "cron_secret")
+      .single();
+
+    if (!secretRow || secretRow.value !== providedSecret) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const now = new Date();
     const todayStart = new Date(now);
     todayStart.setHours(0, 0, 0, 0);
+
+    // === Gespreid versturen in avond-slots ===
+    // Venster: 18:00-20:45 NEDERLANDSE tijd, zomer én winter. De cron
+    // vuurt ruim (16:00-19:45 UTC) zodat beide seizoenen gedekt zijn; hier
+    // rekenen we om naar Europe/Amsterdam en no-op'en we buiten het
+    // NL-venster. Elke gebruiker hangt via een hash van z'n id vast aan
+    // één van de 12 kwartier-slots, zodat niet iedereen tegelijk een push
+    // krijgt en ieder dagelijks rond hetzelfde eigen moment de update
+    // ontvangt.
+    const SLOT_COUNT = 12;
+    const WINDOW_START_NL_MIN = 18 * 60; // 18:00 NL
+    const nlParts = new Intl.DateTimeFormat("nl-NL", {
+      timeZone: "Europe/Amsterdam",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(now);
+    const nlHour = Number(nlParts.find((p) => p.type === "hour")?.value ?? "0");
+    const nlMinute = Number(nlParts.find((p) => p.type === "minute")?.value ?? "0");
+    const minutesNl = nlHour * 60 + nlMinute;
+    const currentSlot = Math.floor((minutesNl - WINDOW_START_NL_MIN) / 15);
+
+    let body: { slot?: number; force?: boolean } = {};
+    try {
+      body = await req.json();
+    } catch {
+      // lege body is prima (cron stuurt {})
+    }
+
+    // Handmatige override voor testen: {slot: n} of {force: true} (= alle slots).
+    const activeSlot = body.slot ?? currentSlot;
+    const allSlots = body.force === true;
+
+    if (!allSlots && (activeSlot < 0 || activeSlot >= SLOT_COUNT)) {
+      return new Response(
+        JSON.stringify({ message: "Outside send window, nothing to do", slot: activeSlot }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Deterministische slot-toewijzing per gebruiker.
+    function slotForUserId(id: string): number {
+      let hash = 0;
+      for (let i = 0; i < id.length; i++) {
+        hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+      }
+      return hash % SLOT_COUNT;
+    }
 
     // Get all posts created today that are active
     const { data: todayPosts, error: postsError } = await supabase
@@ -62,16 +131,10 @@ Deno.serve(async (req) => {
     for (const profile of profiles || []) {
       if (!profile.latitude || !profile.longitude) continue;
 
-      // Check if user already got a daily_update today
-      const { data: existing } = await supabase
-        .from("notifications")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile.id)
-        .eq("type", "daily_update")
-        .gte("created_at", todayStart.toISOString());
+      // Alleen gebruikers van het huidige kwartier-slot (tenzij force).
+      if (!allSlots && slotForUserId(profile.id) !== activeSlot) continue;
 
-      if (existing && (existing as any).length > 0) continue;
-      // Use count check instead
+      // Max één daily_update per gebruiker per dag.
       const { count: existingCount } = await supabase
         .from("notifications")
         .select("*", { count: "exact", head: true })
@@ -101,7 +164,7 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ sent: notificationCount }),
+      JSON.stringify({ sent: notificationCount, slot: allSlots ? "all" : activeSlot }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

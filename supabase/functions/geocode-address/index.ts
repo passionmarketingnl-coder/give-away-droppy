@@ -52,7 +52,10 @@ Deno.serve(async (req) => {
 
     const longitude = parseFloat(match[1]);
     const latitude = parseFloat(match[2]);
-    const displayLocation = doc.weergavenaam || `${postcode}`;
+    // Privacy: alleen de woonplaats tonen, nooit het volledige adres.
+    // weergavenaam bevat straat + huisnummer en display_location is publiek
+    // zichtbaar in de feed.
+    const displayLocation = doc.woonplaatsnaam || postcode.slice(0, 4);
 
     // Update profile with coordinates using service role for reliability
     const serviceClient = createClient(
