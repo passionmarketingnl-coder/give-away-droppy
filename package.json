@@ -9,7 +9,8 @@
     "android": "expo start --android",
     "web": "expo start --web",
     "export:web": "expo export --platform web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "deploy:web": "expo export --platform web && cp vercel-static.json dist/vercel.json && printf \"!assets/node_modules\n!assets/node_modules/**\n\" > dist/.vercelignore && cd dist && vercel deploy --prod --yes"
   },
   "dependencies": {
     "@expo-google-fonts/fredoka": "^0.4.1",
